@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+    <div class="col-md-6">
+        <form method="POST">
+            {% csrf_token %}
+            <input type="text" name="code" placeholder="Enter verification code" required>
+            <button class="btn btn-primary mt-3 w-100" type="submit">Verify</button>
+        </form>
+
+    {% if error %}
+    <p style="color: red;">{{ error }}</p>
+    {% endif %}
+    </div>
+{% endblock %}

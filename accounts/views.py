@@ -2,8 +2,12 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 
-from .forms import UserRegistrationForm, UserLoginForm, ManagerLoginForm, EditProfileForm
+from .forms import UserRegistrationForm, UserLoginForm, ManagerLoginForm, EditProfileForm, SignUpForm
 from accounts.models import User
+
+from django.conf import settings
+from .utils import send_verification_code
+import random
 
 
 def create_manager():
@@ -94,3 +98,36 @@ def edit_profile(request):
         form = EditProfileForm(instance=request.user)
     context = {'title':'Edit Profile', 'form':form}
     return render(request, 'edit_profile.html', context)
+
+
+def signup(request):
+    if request.method == 'POST':
+        form = SignUpForm(request.POST)
+        if form.is_valid():
+            phone_number = form.cleaned_data['phone_number']
+            verification_code = str(random.randint(1000, 9999))  # Generate a 4-digit code
+            print(f"aaaaaaaaaaa{phone_number.as_national}")
+            send_verification_code(phone_number.as_national, verification_code)
+
+            # Save phone number and verification code in session
+            request.session['phone_number'] = phone_number
+            request.session['verification_code'] = verification_code
+
+            return redirect('verify_code')
+    else:
+        form = SignUpForm()
+    return render(request, 'signup.html', {'form': form})
+
+def verify_code(request):
+    if request.method == 'POST':
+        user_code = request.POST.get('code')
+        stored_code = request.session.get('verification_code')
+
+        if user_code == stored_code:
+            phone_number = request.session.get('phone_number')
+            user = User.objects.create_user(username=phone_number, phone_number=phone_number)
+            login(request, user)
+            return redirect('home')
+        else:
+            return render(request, 'accounts/verify_code.html', {'error': 'Invalid code'})
+    return render(request, 'verify_code.html')

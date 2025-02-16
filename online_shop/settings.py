@@ -26,12 +26,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'accounts',
     'crispy_forms',
-    'accounts.apps.AccountsConfig',
     'cart.apps.CartConfig',
     'orders.apps.OrdersConfig',
     'shop.apps.ShopConfig',
     'dashboard.apps.DashboardConfig',
+    'phonenumber_field',
+    
 ]
 
 MIDDLEWARE = [
@@ -137,3 +139,6 @@ EMAIL_USE_SSL = False
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'username@example.com'
 EMAIL_HOST_PASSWORD = 'your-password'
+
+
+KAVENEGAR_API_KEY = '6E73374B61763733312F5637652B4D462F7A2B4277786D6854746A73576863542B575762754868624C2F513D'

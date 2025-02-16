@@ -43,5 +43,8 @@ urlpatterns = [
         ),
         name='password_reset_complete'
     ),
+    path('signup/', views.signup, name='signup'),
+    path('verify-code/', views.verify_code, name='verify_code'),
+
 ]
 

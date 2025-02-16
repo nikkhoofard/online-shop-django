@@ -2,6 +2,10 @@ from django import forms
 
 from .models import User
 
+from phonenumber_field.formfields import PhoneNumberField
+
+class SignUpForm(forms.Form):
+    phone_number = PhoneNumberField()
 
 class UserLoginForm(forms.Form):
     email = forms.EmailField(
