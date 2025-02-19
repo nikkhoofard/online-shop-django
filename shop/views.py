@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.paginator import Paginator
-
+from django.utils.encoding import uri_to_iri
 from shop.models import Product, Category
 from cart.forms import QuantityForm
 
@@ -27,7 +27,7 @@ def home_page(request):
 
 def product_detail(request, slug):
 	form = QuantityForm()
-	product = get_object_or_404(Product, slug=slug)
+	product = get_object_or_404(Product, slug=uri_to_iri(slug))
 	related_products = Product.objects.filter(category=product.category).all()[:5]
 	context = {
 		'title':product.title,
@@ -45,7 +45,7 @@ def product_detail(request, slug):
 def add_to_favorites(request, product_id):
 	product = get_object_or_404(Product, id=product_id)
 	request.user.likes.add(product)
-	return redirect('shop:product_detail', slug=product.slug)
+	return redirect('shop:product_detail', slug=uri_to_iri(product.slug))
 
 
 @login_required

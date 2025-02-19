@@ -11,14 +11,20 @@ class Shop(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     admins = models.ManyToManyField(User, on_delete=models.CASCADE, related_name='Admins')
 
+    def __str__(self):
+        return self.title
+
+
 class Category(models.Model):
-    title = models.CharField(max_length=200)
+
+    title = models.CharField(max_length=200, unique=True,db_collation='utf8_persian_ci')
+    slug = models.SlugField(max_length=200, unique=True,allow_unicode=True,db_collation='utf8_persian_ci',default='default-slug')
+
     sub_category = models.ForeignKey(
         'self', on_delete=models.CASCADE,
         related_name='sub_categories', null=True, blank=True
     )
     is_sub = models.BooleanField(default=False)
-    slug = models.SlugField(max_length=200, unique=True)
 
     def __str__(self):
         return self.title
@@ -35,12 +41,14 @@ class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='category')
     shop = models.ForeignKey(Shop, on_delete=models.CASCADE, related_name='shop')
     image = models.ImageField(upload_to='products')
-    title = models.CharField(max_length=250)
+    #title = models.CharField(max_length=250)
     description = models.TextField()
     price = models.IntegerField()
     date_created = models.DateTimeField(auto_now_add=True)
-    slug = models.SlugField(unique=True)
-
+    #slug = models.SlugField(unique=True)
+    is_active = models.BooleanField(default=True)
+    title = models.CharField(max_length=200, unique=True,db_collation='utf8_persian_ci')
+    slug = models.SlugField(max_length=200, unique=True,allow_unicode=True,db_collation='utf8_persian_ci',default='default-slug')
     class Meta:
         ordering = ('-date_created',)
 
