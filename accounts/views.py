@@ -1,13 +1,17 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
-
+from django.views.decorators.csrf import csrf_protect
 from .forms import UserRegistrationForm, UserLoginForm, ManagerLoginForm, EditProfileForm, SignUpForm
 from accounts.models import User
-
+from django.contrib.auth import login, get_user_model
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
 from django.conf import settings
 from .utils import send_verification_code
 import random
+from django.db import IntegrityError
+from django.contrib.auth.password_validation import validate_password
 
 
 def create_manager():
@@ -30,7 +34,7 @@ def manager_login(request):
         if form.is_valid():
             data = form.cleaned_data
             user = authenticate(
-                request, email=data['email'], password=data['password']
+                request, phone_number=data['phone_number'], password=data['password']
             )
             if user is not None and user.is_manager:
                 login(request, user)
@@ -67,7 +71,7 @@ def user_login(request):
         if form.is_valid():
             data = form.cleaned_data
             user = authenticate(
-                request, email=data['email'], password=data['password']
+                request, phone_number=data['phone_number'], password=data['password']
             )
             if user is not None:
                 login(request, user)
@@ -99,35 +103,88 @@ def edit_profile(request):
     context = {'title':'Edit Profile', 'form':form}
     return render(request, 'edit_profile.html', context)
 
+def verify_code(request):
+    if request.method == 'POST':
+        user_code = request.POST.get('code')
+        stored_code = request.session.get('verification_code')
+        phone_number = request.session.get('phone_number')
+
+        if not phone_number or not stored_code:
+            return redirect('accounts:signup')  # Prevent direct access without session data
+
+        if user_code == stored_code:
+            # Mark phone as verified and move to password setup
+            request.session['verified_phone'] = phone_number
+            return redirect('accounts:set_password')
+        
+        return render(request, 'verify_code.html', {'error': 'Invalid code'})
+    
+    return render(request, 'verify_code.html')
+
+
+
+@csrf_protect
+def set_password(request):
+    phone_number = request.session.get('verified_phone')
+    if not phone_number:
+        return redirect('accounts:signup')
+
+    if request.method == 'POST':
+        password = request.POST.get('password')
+        password_confirm = request.POST.get('password_confirm')
+        error = None
+
+        try:
+            # Validate passwords
+            if password != password_confirm:
+                raise ValidationError("Passwords do not match")
+                
+            validate_password(password)
+
+
+            print(phone_number,'hfdjskalhfnodahwuijefbvai')
+            # Create user properly
+            user = User.objects.create_user(
+                phone_number=phone_number,
+                password=password,  # Django auto-hashes
+                is_verify=True,
+                is_active=True,
+                # username=phone_number  # Uncomment if needed
+            )
+
+            request.session.flush()
+            login(request, user)
+            return redirect('accounts:login/manager')
+
+        except ValidationError as e:
+            error = e.messages[0] if e.messages else "Invalid password"
+        except IntegrityError:
+            error = "Account already exists with this phone number"
+        except Exception as e:
+            error = f"Registration error: {str(e)}"
+            # Log this error for debugging: logger.error(e)
+
+        return render(request, 'set_password.html', {
+            'error': error,
+            'phone_number': phone_number
+        })
+
+    return render(request, 'set_password.html', {'phone_number': phone_number})
+
 
 def signup(request):
     if request.method == 'POST':
         form = SignUpForm(request.POST)
         if form.is_valid():
-            phone_number = form.cleaned_data['phone_number']
+            phone_number = str(form.cleaned_data['phone_number'])
             verification_code = str(random.randint(1000, 9999))  # Generate a 4-digit code
-            print(f"aaaaaaaaaaa{phone_number.as_national}")
-            send_verification_code(phone_number.as_national, verification_code)
-
             # Save phone number and verification code in session
             request.session['phone_number'] = phone_number
             request.session['verification_code'] = verification_code
-
-            return redirect('verify_code')
+            request.session.set_expiry(600)
+            send_verification_code(str(phone_number), verification_code) 
+            return redirect('accounts:verify_code')
     else:
         form = SignUpForm()
     return render(request, 'signup.html', {'form': form})
 
-def verify_code(request):
-    if request.method == 'POST':
-        user_code = request.POST.get('code')
-        stored_code = request.session.get('verification_code')
-
-        if user_code == stored_code:
-            phone_number = request.session.get('phone_number')
-            user = User.objects.create_user(username=phone_number, phone_number=phone_number)
-            login(request, user)
-            return redirect('home')
-        else:
-            return render(request, 'accounts/verify_code.html', {'error': 'Invalid code'})
-    return render(request, 'verify_code.html')

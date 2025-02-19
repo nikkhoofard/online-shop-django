@@ -1,7 +1,15 @@
 from django.db import models
 from django.urls import reverse
 from django.template.defaultfilters import slugify
+from django.contrib.auth import get_user_model
 
+User = get_user_model()
+
+class Shop(models.Model):
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user')
+    title = models.CharField(max_length=200,unique=True)
+    date_created = models.DateTimeField(auto_now_add=True)
+    admins = models.ManyToManyField(User, on_delete=models.CASCADE, related_name='Admins')
 
 class Category(models.Model):
     title = models.CharField(max_length=200)
@@ -25,6 +33,7 @@ class Category(models.Model):
 
 class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='category')
+    shop = models.ForeignKey(Shop, on_delete=models.CASCADE, related_name='shop')
     image = models.ImageField(upload_to='products')
     title = models.CharField(max_length=250)
     description = models.TextField()
