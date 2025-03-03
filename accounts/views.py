@@ -31,6 +31,7 @@ def create_manager():
 def manager_login(request):
     if request.method == 'POST':
         form = ManagerLoginForm(request.POST)
+
         if form.is_valid():
             data = form.cleaned_data
             user = authenticate(
@@ -69,10 +70,13 @@ def user_login(request):
     if request.method == 'POST':
         form = UserLoginForm(request.POST)
         if form.is_valid():
+
             data = form.cleaned_data
+            print(f'data is : {data}')
             user = authenticate(
                 request, phone_number=data['phone_number'], password=data['password']
             )
+
             if user is not None:
                 login(request, user)
                 return redirect('shop:home_page')
@@ -141,8 +145,6 @@ def set_password(request):
                 
             validate_password(password)
 
-
-            print(phone_number,'hfdjskalhfnodahwuijefbvai')
             # Create user properly
             user = User.objects.create_user(
                 phone_number=phone_number,
@@ -154,7 +156,7 @@ def set_password(request):
 
             request.session.flush()
             login(request, user)
-            return redirect('accounts:manager_login')
+            return redirect('accounts:shop:home_page')
 
         except ValidationError as e:
             error = e.messages[0] if e.messages else "Invalid password"
@@ -187,4 +189,89 @@ def signup(request):
     else:
         form = SignUpForm()
     return render(request, 'signup.html', {'form': form})
+
+def reset_password(request):
+    if request.method == 'POST':
+        form = SignUpForm(request.POST)
+        if form.is_valid():
+            phone_number = str(form.cleaned_data['phone_number'])
+            verification_code = str(random.randint(1000, 9999))  # Generate a 4-digit code
+            # Save phone number and verification code in session
+            request.session['phone_number'] = phone_number
+            request.session['verification_code'] = verification_code
+            request.session.set_expiry(600)
+            send_verification_code(str(phone_number), verification_code)
+            return redirect('accounts:verify_reset_code')
+    else:
+        form = SignUpForm()
+    return render(request, 'reset_password.html', {'form': form})
+
+
+def verify_reset_code(request):
+    if request.method == 'POST':
+        user_code = request.POST.get('code')
+        stored_code = request.session.get('verification_code')
+        phone_number = request.session.get('phone_number')
+
+        if not phone_number or not stored_code:
+            return redirect('accounts:reset_password')  # Prevent direct access without session data
+
+        if user_code == stored_code:
+            # Mark phone as verified and move to password setup
+            request.session['verified_phone'] = phone_number
+            return redirect('accounts:set_new_password')
+
+        return render(request, 'verify_code.html', {'error': 'Invalid code'})
+
+    return render(request, 'verify_code.html')
+
+
+@csrf_protect
+def set_new_password(request):
+    phone_number = request.session.get('verified_phone')
+    if not phone_number:
+        return redirect('accounts:signup')
+
+    if request.method == 'POST':
+        password = request.POST.get('password')
+        password_confirm = request.POST.get('password_confirm')
+        error = None
+
+        try:
+            # Validate passwords
+            if password != password_confirm:
+                raise ValidationError("Passwords do not match")
+
+
+
+            # Create user properly
+            print('adfasdgsragfdad')
+            user_exists = User.objects.filter(
+                phone_number=phone_number).exists()
+
+            if user_exists:
+                # Update the user's password
+              user =  User.objects.filter(phone_number=phone_number).update(
+                    password=validate_password(password))
+            else:
+                # Handle the case when no user exists
+                print("User does not exist.")
+            request.session.flush()
+            login(request, user)
+            return redirect('accounts:shop:home_page')
+
+        except ValidationError as e:
+            error = e.messages[0] if e.messages else "Invalid password"
+        except IntegrityError:
+            error = "Account already exists with this phone number"
+        except Exception as e:
+            error = f"Registration error: {str(e)}"
+            # Log this error for debugging: logger.error(e)
+
+        return render(request, 'set_new_password.html', {
+            'error': error,
+            'phone_number': phone_number
+        })
+
+    return render(request, 'set_new_password.html', {'phone_number': phone_number})
 

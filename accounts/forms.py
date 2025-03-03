@@ -14,12 +14,14 @@ class UserLoginForm(forms.Form):
             attrs={'class': 'form-control', 'placeholder': 'Phone Number', 'type': 'tel'}
         ),
         max_length=20,
-        required=False)
+        required=True)
     
     password = forms.CharField(
         widget=forms.PasswordInput(
-            attrs={'class': 'form-control', 'placeholder': 'password'}
-        )
+            attrs={'class': 'form-control', 'placeholder': 'password'},
+
+        ),
+        required=True
     )
 
     def clean_phone_number(self):
