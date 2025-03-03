@@ -242,23 +242,22 @@ def set_new_password(request):
             if password != password_confirm:
                 raise ValidationError("Passwords do not match")
 
+            validate_password(password)
 
-
-            # Create user properly
-            print('adfasdgsragfdad')
-            user_exists = User.objects.filter(
-                phone_number=phone_number).exists()
+            user_exists = User.objects.filter(phone_number=phone_number).exists()
 
             if user_exists:
-                # Update the user's password
-              user =  User.objects.filter(phone_number=phone_number).update(
-                    password=validate_password(password))
+                # Update existing user's password
+                user = User.objects.get(phone_number=phone_number)
+                user.set_password(password)
+                user.save()
             else:
-                # Handle the case when no user exists
-                print("User does not exist.")
+                print('user ')
+
+
             request.session.flush()
             login(request, user)
-            return redirect('accounts:shop:home_page')
+            return redirect('shop:home_page')
 
         except ValidationError as e:
             error = e.messages[0] if e.messages else "Invalid password"
