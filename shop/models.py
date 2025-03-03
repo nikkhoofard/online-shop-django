@@ -5,11 +5,19 @@ from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
+"""
+adrees
+phone number 
+location gis
+نمایندگی کجاها دارد
+description
+"""
+
 class Shop(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user')
     title = models.CharField(max_length=200,unique=True)
     date_created = models.DateTimeField(auto_now_add=True)
-    admins = models.ManyToManyField(User, on_delete=models.CASCADE, related_name='Admins')
+    admins = models.ManyToManyField(User, related_name='Admins')
 
 class Category(models.Model):
     title = models.CharField(max_length=200)
@@ -29,7 +37,15 @@ class Category(models.Model):
     def save(self, *args, **kwargs): # new
         self.slug = slugify(self.title)
         return super().save(*args, **kwargs)
-        
+
+"""
+for which car
+brand 
+company name
+price date 
+garanty darad ya na
+چند ماه گارانتی دارد 
+"""    
 
 class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='category')

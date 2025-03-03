@@ -154,7 +154,7 @@ def set_password(request):
 
             request.session.flush()
             login(request, user)
-            return redirect('accounts:login/manager')
+            return redirect('accounts:manager_login')
 
         except ValidationError as e:
             error = e.messages[0] if e.messages else "Invalid password"

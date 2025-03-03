@@ -14,7 +14,7 @@ class UserLoginForm(forms.Form):
             attrs={'class': 'form-control', 'placeholder': 'Phone Number', 'type': 'tel'}
         ),
         max_length=20,
-        required=False
+        required=False)
     
     password = forms.CharField(
         widget=forms.PasswordInput(
@@ -56,7 +56,7 @@ class ManagerLoginForm(forms.Form):
             attrs={'class': 'form-control', 'placeholder': 'Phone Number', 'type': 'tel'}
         ),
         max_length=20,
-        required=False
+        required=False)
     
     password = forms.CharField(
         widget=forms.PasswordInput(

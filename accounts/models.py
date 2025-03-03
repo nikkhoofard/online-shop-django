@@ -3,7 +3,7 @@ from django.contrib.auth.models import AbstractBaseUser
 
 from phonenumber_field.modelfields import PhoneNumberField
 from .managers import UserManager
-from shop.models import Product
+#from shop.models import Product
 from django.contrib.auth.models import BaseUserManager
 
 class UserManager(BaseUserManager):
@@ -42,7 +42,7 @@ class User(AbstractBaseUser):
 
     objects = UserManager()
 
-    USERNAME_FIELD =   'phone_number'
+    USERNAME_FIELD ='phone_number'
 
 
     def __str__(self):
