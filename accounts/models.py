@@ -7,12 +7,13 @@ from .managers import UserManager
 from django.contrib.auth.models import BaseUserManager
 
 class UserManager(BaseUserManager):
-    def create_user(self, phone_number, password=None, **extra_fields):
+    def create_user(self, phone_number, password=None, is_manager=False, **extra_fields):
         if not phone_number:
             raise ValueError('The Phone Number must be set')
         
-        user = self.model(phone_number=phone_number, **extra_fields)
+        user = self.model(phone_number=phone_number,is_manager=is_manager, **extra_fields)
         user.set_password(password)
+
         user.save(using=self._db)
         return user
 

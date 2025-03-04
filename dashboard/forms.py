@@ -1,7 +1,7 @@
 from django import forms
 from django.forms import ModelForm
 
-from shop.models import Product, Category
+from shop.models import Product, Category, Shop
 
 
 class AddProductForm(ModelForm):
@@ -11,6 +11,17 @@ class AddProductForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(AddProductForm, self).__init__(*args, **kwargs)
+        for visible in self.visible_fields():
+            visible.field.widget.attrs['class'] = 'form-control'
+
+
+class AddShopForm(ModelForm):
+    class Meta:
+        model = Shop
+        fields = ['title', 'address', 'postal_code','description', 'phone_number']
+
+    def __init__(self, *args, **kwargs):
+        super(AddShopForm, self).__init__(*args, **kwargs)
         for visible in self.visible_fields():
             visible.field.widget.attrs['class'] = 'form-control'
 

@@ -2,6 +2,8 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.views.decorators.csrf import csrf_protect
+
+from dashboard.views import is_manager
 from .forms import UserRegistrationForm, UserLoginForm, ManagerLoginForm, EditProfileForm, SignUpForm
 from accounts.models import User
 from django.contrib.auth import login, get_user_model
@@ -136,6 +138,7 @@ def set_password(request):
     if request.method == 'POST':
         password = request.POST.get('password')
         password_confirm = request.POST.get('password_confirm')
+        is_manager = request.POST.get('is_manager')
         error = None
 
         try:
@@ -151,6 +154,7 @@ def set_password(request):
                 password=password,  # Django auto-hashes
                 is_verify=True,
                 is_active=True,
+                is_manager=is_manager,
                 # username=phone_number  # Uncomment if needed
             )
 

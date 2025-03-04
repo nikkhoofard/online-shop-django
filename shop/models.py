@@ -14,9 +14,13 @@ description
 """
 
 class Shop(models.Model):
-    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user')
+    owner = models.OneToOneField(User, on_delete=models.CASCADE, related_name='user')
     title = models.CharField(max_length=200,unique=True)
     date_created = models.DateTimeField(auto_now_add=True)
+    address = models.CharField(max_length=200)
+    postal_code = models.CharField(max_length=10)
+    description = models.TextField()
+    phone_number = models.CharField(max_length=20)
     admins = models.ManyToManyField(User, related_name='Admins')
 
 class Category(models.Model):

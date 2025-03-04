@@ -7,7 +7,7 @@ from django.http import Http404
 from shop.models import Product
 from accounts.models import User
 from orders.models import Order, OrderItem
-from .forms import AddProductForm, AddCategoryForm, EditProductForm
+from .forms import AddProductForm, AddCategoryForm, EditProductForm, AddShopForm
 
 
 def is_manager(user):
@@ -25,6 +25,22 @@ def products(request):
     products = Product.objects.all()
     context = {'title':'Products' ,'products':products}
     return render(request, 'products.html', context)
+
+@user_passes_test(is_manager)
+@login_required
+def add_shop(request):
+    if request.method == 'POST':
+        form = AddShopForm(request.POST)
+        if form.is_valid():
+            user = request.user
+            form.owner = user
+            form.save()
+            messages.success(request, 'Shop added Successfuly!')
+            return redirect('dashboard:add_shop')
+    else:
+        form = AddShopForm()
+    context = {'title':'Add shop', 'form':form}
+    return render(request, 'add_shop.html', context)
 
 
 @user_passes_test(is_manager)
