@@ -51,20 +51,30 @@ def add_shop(request):
             form = AddShopForm()
         context = {'title':'Add shop', 'form':form}
         return render(request, 'add_shop.html', context)
+    
 @user_passes_test(is_manager)
 @login_required
 def add_product(request):
-    if request.method == 'POST':
-        form = AddProductForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Product added Successfuly!')
-            return redirect('dashboard:add_product')
-    else:
-        form = AddProductForm()
-    context = {'title':'Add Product', 'form':form}
-    return render(request, 'add_product.html', context)
-
+    try:
+        # Get the shop owned by the current user
+        shop = Shop.objects.get(owner=request.user)
+        
+        if request.method == 'POST':
+            form = AddProductForm(request.POST, request.FILES)
+            if form.is_valid():
+                product = form.save(commit=False)
+                product.shop = shop  # Set the shop to the user's shop
+                product.save()
+                messages.success(request, 'Product added Successfully!')
+                return redirect('dashboard:add_product')
+        else:
+            form = AddProductForm()
+        context = {'title':'Add Product', 'form':form}
+        return render(request, 'add_product.html', context)
+    except Shop.DoesNotExist:
+        # If user doesn't have a shop, redirect to add shop page
+        messages.warning(request, "You need to create a shop before adding products!")
+        return redirect('dashboard:add_shop')
 
 @user_passes_test(is_manager)
 @login_required
@@ -120,3 +130,33 @@ def order_detail(request, id):
     items = OrderItem.objects.filter(order=order).all()
     context = {'title':'order detail', 'items':items, 'order':order}
     return render(request, 'order_detail.html', context)
+
+
+@user_passes_test(is_manager)
+@login_required
+def shop_detail(request):
+    try:
+        # Get the shop owned by the current user
+        shop = Shop.objects.get(owner=request.user)
+        
+        if request.method == 'POST':
+            form = AddShopForm(request.POST, instance=shop)
+            if form.is_valid():
+                form.save()
+                messages.success(request, 'Shop details updated successfully!')
+                return redirect('dashboard:shop_detail')
+        else:
+            form = AddShopForm(instance=shop)
+            
+        context = {
+            'title': 'Shop Details',
+            'form': form,
+            'shop': shop
+        }
+        return render(request, 'edit_show_shop.html', context)
+    except Shop.DoesNotExist:
+        # If user doesn't have a shop, redirect to add shop page
+        messages.warning(request, "You don't have a shop yet. Create one first!")
+        return redirect('dashboard:add_shop')
+
+

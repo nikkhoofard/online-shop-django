@@ -49,7 +49,28 @@ company name
 price date 
 garanty darad ya na
 چند ماه گارانتی دارد 
-"""    
+"""
+
+class CarBrand(models.Model):
+    """Car manufacturers like Toyota, Honda, BMW, etc."""
+    name = models.CharField(max_length=100, unique=True)
+    
+    def __str__(self):
+        return self.name
+
+class CarModel(models.Model):
+    """Specific car models like Corolla, Civic, 3-Series, etc."""
+    brand = models.ForeignKey(CarBrand, on_delete=models.CASCADE, related_name='car_models')
+    name = models.CharField(max_length=100)
+    year_start = models.PositiveIntegerField(null=True, blank=True)  # Optional start year
+    year_end = models.PositiveIntegerField(null=True, blank=True)    # Optional end year
+    
+    class Meta:
+        unique_together = ('brand', 'name')
+        
+    def __str__(self):
+        return f"{self.brand} {self.name}"
+
 
 class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='category')
@@ -61,6 +82,13 @@ class Product(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     slug = models.SlugField(unique=True)
 
+    compatible_cars = models.ManyToManyField(CarModel, related_name='compatible_products')
+    brand = models.CharField(max_length=100, help_text="Brand of the product")
+    manufacturer = models.CharField(max_length=100, help_text="Company that manufactured the product")
+    price_valid_until = models.DateField(null=True, blank=True)
+    has_warranty = models.BooleanField(default=False)
+    warranty_months = models.PositiveIntegerField(default=0, help_text="Number of months of warranty")
+    
     class Meta:
         ordering = ('-date_created',)
 
