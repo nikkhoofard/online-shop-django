@@ -7,14 +7,23 @@ from shop.models import Product, Category, Shop
 class AddProductForm(ModelForm):
     class Meta:
         model = Product
-        fields = ['category', 'image', 'title','description', 'price']
+        fields = [
+            'category', 'image', 'title', 'description', 'price',
+            'compatible_cars', 'brand', 'manufacturer', 'price_valid_until',
+            'has_warranty', 'warranty_months'
+        ]
+        widgets = {
+            'price_valid_until': forms.DateInput(attrs={'type': 'date'}),
+            'compatible_cars': forms.SelectMultiple(attrs={'class': 'form-control'}),
+        }
 
     def __init__(self, *args, **kwargs):
         super(AddProductForm, self).__init__(*args, **kwargs)
         for visible in self.visible_fields():
-            visible.field.widget.attrs['class'] = 'form-control'
-
-
+            if visible.name != 'has_warranty':  # Don't add form-control to checkbox
+                visible.field.widget.attrs['class'] = 'form-control'
+            if visible.name == 'has_warranty':
+                visible.field.widget.attrs['class'] = 'form-check-input'
 class AddShopForm(ModelForm):
     class Meta:
         model = Shop
@@ -42,9 +51,20 @@ class AddCategoryForm(ModelForm):
 class EditProductForm(ModelForm):
     class Meta:
         model = Product
-        fields = ['category', 'image', 'title','description', 'price']
+        fields = [
+            'category', 'image', 'title', 'description', 'price',
+            'compatible_cars', 'brand', 'manufacturer', 'price_valid_until',
+            'has_warranty', 'warranty_months'
+        ]
+        widgets = {
+            'price_valid_until': forms.DateInput(attrs={'type': 'date'}),
+            'compatible_cars': forms.SelectMultiple(attrs={'class': 'form-control'}),
+        }
 
     def __init__(self, *args, **kwargs):
         super(EditProductForm, self).__init__(*args, **kwargs)
         for visible in self.visible_fields():
-            visible.field.widget.attrs['class'] = 'form-control'
+            if visible.name != 'has_warranty':  # Don't add form-control to checkbox
+                visible.field.widget.attrs['class'] = 'form-control'
+            if visible.name == 'has_warranty':
+                visible.field.widget.attrs['class'] = 'form-check-input'

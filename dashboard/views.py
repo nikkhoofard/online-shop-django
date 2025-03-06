@@ -22,9 +22,18 @@ def is_manager(user):
 @user_passes_test(is_manager)
 @login_required
 def products(request):
-    products = Product.objects.all()
-    context = {'title':'Products' ,'products':products}
-    return render(request, 'products.html', context)
+    try:
+        user_shop = Shop.objects.get(owner=request.user)
+    # Then get products from that shop
+        products = Product.objects.filter(shop=user_shop)
+        context = {'title':'Products' ,'products':products}
+        return render(request, 'products.html', context)
+    except Shop.DoesNotExist:
+    # Handle case where user doesn't have a shop
+        products = Product.objects.none()
+        context = {'title':'Products' ,'products':products}
+        return render(request, 'products.html', context)
+    
 
 @user_passes_test(is_manager)
 @login_required
@@ -65,6 +74,8 @@ def add_product(request):
                 product = form.save(commit=False)
                 product.shop = shop  # Set the shop to the user's shop
                 product.save()
+                # Save the many-to-many relationships
+                form.save_m2m()
                 messages.success(request, 'Product added Successfully!')
                 return redirect('dashboard:add_product')
         else:
@@ -75,7 +86,7 @@ def add_product(request):
         # If user doesn't have a shop, redirect to add shop page
         messages.warning(request, "You need to create a shop before adding products!")
         return redirect('dashboard:add_shop')
-
+    
 @user_passes_test(is_manager)
 @login_required
 def delete_product(request, id):
@@ -88,6 +99,17 @@ def delete_product(request, id):
 @login_required
 def edit_product(request, id):
     product = get_object_or_404(Product, id=id)
+    
+    # Check if the product belongs to the user's shop
+    try:
+        user_shop = Shop.objects.get(owner=request.user)
+        if product.shop != user_shop:
+            messages.error(request, "You can only edit products from your own shop!")
+            return redirect('dashboard:products')
+    except Shop.DoesNotExist:
+        messages.error(request, "You don't have a shop!")
+        return redirect('dashboard:add_shop')
+    
     if request.method == 'POST':
         form = EditProductForm(request.POST, request.FILES, instance=product)
         if form.is_valid():
@@ -98,7 +120,6 @@ def edit_product(request, id):
         form = EditProductForm(instance=product)
     context = {'title': 'Edit Product', 'form':form}
     return render(request, 'edit_product.html', context)
-
 
 @user_passes_test(is_manager)
 @login_required
