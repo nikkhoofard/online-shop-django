@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.decorators import user_passes_test
 from django.http import Http404
 
-from shop.models import Product
+from shop.models import Product, Shop
 from accounts.models import User
 from orders.models import Order, OrderItem
 from .forms import AddProductForm, AddCategoryForm, EditProductForm, AddShopForm
@@ -29,20 +29,28 @@ def products(request):
 @user_passes_test(is_manager)
 @login_required
 def add_shop(request):
-    if request.method == 'POST':
-        form = AddShopForm(request.POST)
-        if form.is_valid():
-            user = request.user
-            form.owner = user
-            form.save()
-            messages.success(request, 'Shop added Successfuly!')
-            return redirect('dashboard:add_shop')
-    else:
-        form = AddShopForm()
-    context = {'title':'Add shop', 'form':form}
-    return render(request, 'add_shop.html', context)
-
-
+    # Check if user already has a shop
+    try:
+        user_shop = Shop.objects.get(owner=request.user)
+        # If user already has a shop, show message and redirect to products page
+        messages.warning(request, 'You already have a shop! You cannot create another one.')
+        return redirect('dashboard:products')
+    except Shop.DoesNotExist:
+        # User doesn't have a shop, proceed with shop creation
+        if request.method == 'POST':
+            form = AddShopForm(request.POST)
+            if form.is_valid():
+                user = request.user
+                
+                shop = form.save(commit=False)
+                shop.owner = user
+                shop.save()
+                messages.success(request, 'Shop added Successfuly!')
+                return redirect('dashboard:add_shop')
+        else:
+            form = AddShopForm()
+        context = {'title':'Add shop', 'form':form}
+        return render(request, 'add_shop.html', context)
 @user_passes_test(is_manager)
 @login_required
 def add_product(request):
