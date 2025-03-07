@@ -14,7 +14,7 @@ class AddProductForm(ModelForm):
         ]
         widgets = {
             'price_valid_until': forms.DateInput(attrs={'type': 'date'}),
-            'compatible_cars': forms.SelectMultiple(attrs={'class': 'form-control'}),
+            'compatible_cars': forms.SelectMultiple(attrs={'class': 'select2-multiple'}),
         }
 
     def __init__(self, *args, **kwargs):

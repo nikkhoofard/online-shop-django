@@ -60,7 +60,7 @@
                             <div class="col-md-12 mb-3">
                                 <label class="form-label">{{ form.compatible_cars.label }}</label>
                                 {{ form.compatible_cars }}
-                                <small class="text-muted">Hold Ctrl/Cmd to select multiple cars</small>
+                                <small class="text-muted">Search and select compatible car models</small>
                             </div>
                         </div>
                         
@@ -90,4 +90,13 @@
         </div>
     </div>
 </div>
+<script>
+    $(document).ready(function() {
+        $('#{{ form.compatible_cars.id_for_label }}').select2({
+            placeholder: "Search for car models...",
+            allowClear: true,
+            width: '100%'
+        });
+    });
+</script>
 {% endblock %}
