@@ -55,12 +55,12 @@
             </a>
             <hr>
             <a class="text-decoration-none" href="{% url 'shop:home_page' %}">
-                <li class="rounded list-group-item bg-primary mt-2  text-white">Back To shop</li>
+                <li class="rounded list-group-item bg-primary mt-2  text-white">بازگشت به فروشگاه</li> 
             </a>
             <a class="text-decoration-none" href="{% url 'accounts:user_logout' %}">
-                <li class="rounded list-group-item bg-danger mt-2  text-white">Logout</li>
+                <li class="rounded list-group-item bg-danger mt-2  text-white">خروج</li>
             </a>
-            <div class="text-muted mt-2">You logged in as: {{ request.user.email }}</div>
+            <div class="text-muted mt-2">شما وارد شده اید: {{ request.user.email }}</div>
         </div>
         <div class="col-md-1 "></div>
     </div>

@@ -182,7 +182,7 @@ def signup(request):
     if request.method == 'POST':
         form = SignUpForm(request.POST)
         if form.is_valid():
-            phone_number = str(form.cleaned_data['phone_number'])
+            phone_number = str(form.cleaned_data['full_phone_number'])
             verification_code = str(random.randint(1000, 9999))  # Generate a 4-digit code
             # Save phone number and verification code in session
             request.session['phone_number'] = phone_number
@@ -198,7 +198,7 @@ def reset_password(request):
     if request.method == 'POST':
         form = SignUpForm(request.POST)
         if form.is_valid():
-            phone_number = str(form.cleaned_data['phone_number'])
+            phone_number = str(form.cleaned_data['full_phone_number'])
             verification_code = str(random.randint(1000, 9999))  # Generate a 4-digit code
             # Save phone number and verification code in session
             request.session['phone_number'] = phone_number
