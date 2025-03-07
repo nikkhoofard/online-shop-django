@@ -6,13 +6,13 @@
         <div class="col-md-10 offset-md-1">
             <div class="card">
                 <div class="card-header bg-primary text-white">
-                    <h3 class="card-title">Add New Product</h3>
+                    <h3 class="card-title">افزودن محصول جدید</h3>
                 </div>
                 <div class="card-body">
                     <form method="POST" enctype="multipart/form-data">
                         {% csrf_token %}
                         
-                        <h4 class="mb-3">Basic Information</h4>
+                        <h4 class="mb-3">اطلاعات اصلی</h4>
                         <div class="row mb-4">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">{{ form.title.label }}</label>
@@ -41,7 +41,7 @@
                             </div>
                         </div>
                         
-                        <h4 class="mb-3">Product Details</h4>
+                        <h4 class="mb-3">جزئیات محصول</h4>
                         <div class="row mb-4">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">{{ form.brand.label }}</label>
@@ -55,34 +55,34 @@
                             </div>
                         </div>
                         
-                        <h4 class="mb-3">Compatibility</h4>
+                        <h4 class="mb-3">سازگاری</h4>
                         <div class="row mb-4">
                             <div class="col-md-12 mb-3">
                                 <label class="form-label">{{ form.compatible_cars.label }}</label>
                                 {{ form.compatible_cars }}
-                                <small class="text-muted">Search and select compatible car models</small>
+                                <small class="text-muted">جستجو و انتخاب مدل ماشین های سازگار</small>
                             </div>
                         </div>
                         
-                        <h4 class="mb-3">Warranty Information</h4>
+                        <h4 class="mb-3">اطلاعات اعتماد</h4>
                         <div class="row mb-4">
                             <div class="col-md-6 mb-3">
                                 <div class="form-check">
                                     {{ form.has_warranty }}
                                     <label class="form-check-label" for="{{ form.has_warranty.id_for_label }}">
-                                        Has Warranty
+                                        اعتماد دارد؟
                                     </label>
                                 </div>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">{{ form.warranty_months.label }}</label>
                                 {{ form.warranty_months }}
-                                <small class="text-muted">Number of months of warranty</small>
+                                <small class="text-muted">تعداد ماه های اعتماد</small>
                             </div>
                         </div>
                         
                         <div class="form-group">
-                            <button class="btn btn-primary mt-3 w-100" type="submit">Add Product</button>
+                            <button class="btn btn-primary mt-3 w-100" type="submit">ثبت</button>
                         </div>
                     </form>
                 </div>
@@ -93,7 +93,7 @@
 <script>
     $(document).ready(function() {
         $('#{{ form.compatible_cars.id_for_label }}').select2({
-            placeholder: "Search for car models...",
+            placeholder: "جستجوی مدل ماشین...",
             allowClear: true,
             width: '100%'
         });

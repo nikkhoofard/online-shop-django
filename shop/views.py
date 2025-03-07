@@ -24,7 +24,7 @@ def home_page(request):
 	context = {'products': paginat(request ,products)}
 	return render(request, 'home_page.html', context)
 
-
+@login_required
 def product_detail(request, slug):
 	form = QuantityForm()
 	product = get_object_or_404(Product, slug=slug)

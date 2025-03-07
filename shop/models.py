@@ -30,16 +30,30 @@ class Category(models.Model):
         related_name='sub_categories', null=True, blank=True
     )
     is_sub = models.BooleanField(default=False)
-    slug = models.SlugField(max_length=200, unique=True)
+    slug = models.SlugField(max_length=200, unique=True, allow_unicode=True, default='default-slug')
 
     def __str__(self):
-        return self.title
+        return self.title or "Untitled Category"
 
     def get_absolute_url(self):
-        return reverse('shop:product_detail', kwargs={'slug':self.slug})
+        if not self.slug:
+            # Generate a slug if it's empty
+            self.slug = slugify(self.title)
+            if not self.slug:
+                self.slug = f"category-{self.id or 'new'}"
+            # Save the object if it has an ID (already exists in the database)
+            if self.id:
+                self.save(update_fields=['slug'])
+        return reverse('shop:filter_by_category', kwargs={'slug': self.slug})
 
     def save(self, *args, **kwargs): # new
+        if not self.title:
+            self.title = "Untitled Category"
         self.slug = slugify(self.title)
+        if not self.slug:
+            # If slugify returns empty (e.g., for non-Latin characters)
+            # Use a default slug with the ID
+            self.slug = f"category-{self.id or 'new'}"
         return super().save(*args, **kwargs)
 
 """
@@ -80,7 +94,7 @@ class Product(models.Model):
     description = models.TextField()
     price = models.IntegerField()
     date_created = models.DateTimeField(auto_now_add=True)
-    slug = models.SlugField(unique=True)
+    slug = models.SlugField(unique=True, allow_unicode=True, default='default-slug')
 
     compatible_cars = models.ManyToManyField(CarModel, related_name='compatible_products')
     brand = models.CharField(max_length=100, help_text="Brand of the product")
@@ -93,11 +107,25 @@ class Product(models.Model):
         ordering = ('-date_created',)
 
     def __str__(self):
-        return self.slug
+        return self.title or "Untitled Product"
         
     def get_absolute_url(self):
-        return reverse('shop:product_detail', kwargs={'slug':self.slug})
+        if not self.slug:
+            # Generate a slug if it's empty
+            self.slug = slugify(self.title)
+            if not self.slug:
+                self.slug = f"product-{self.id or 'new'}"
+            # Save the object if it has an ID (already exists in the database)
+            if self.id:
+                self.save(update_fields=['slug'])
+        return reverse('shop:product_detail', kwargs={'slug': self.slug})
 
     def save(self, *args, **kwargs):
+        if not self.title:
+            self.title = "Untitled Product"
         self.slug = slugify(self.title)
+        if not self.slug:
+            # If slugify returns empty (e.g., for non-Latin characters)
+            # Use a default slug with the ID
+            self.slug = f"product-{self.id or 'new'}"
         return super().save(*args, **kwargs)
