@@ -2,7 +2,7 @@
 
 {% block content %}
 
-<div class="row mb-3 mt-4">
+<div class="row mb-3 mt-4" dir="rtl">
     <div class="col-md-1"></div>
     <!-- product content -->
     <div class="col-md-5 p-3 border rounded">
@@ -13,15 +13,47 @@
         <!-- title -->
         <h2>{{ product.title }}</h2>
         <!-- price -->
-        <h4 class="mt-4 text-dark">قیمت: ${{ product.price }}</h4>
+        <h4 class="mt-4 text-dark">قیمت: {{ product.price }}هزار تومان</h4>
+
+        <h4 class="mt-4 text-dark">برند تولید کننده: {{ product.brand }}</h4>   
+        
+        <h4 class="mt-4 text-dark">آیا بیمه دارد : {% if product.has_warranty %}دارد{% else %}ندارد{% endif %}</h4>
+        {% if product.has_warranty %}
+            <h4 class="mt-4 text-dark">بیمه شده توسط : {{ product.manufacturer }}</h4>
+            <h4 class="mt-4 text-dark">مدت بیمه : {{ product.warranty_months }} ماه</h4>
+        {% endif %}
+
+        {% if product.price_valid_until %}
+            <h4 class="mt-4 text-dark">قیمت معتبر تا تاریخ : {{ product.price_valid_until }}</h4>
+        {% endif %}
         <!-- description -->
-        <div class="mt-4 pe-3 mb-5">{{ product.description }}</div>
-        <!-- cart btn -->
+        <div class="mt-4 pe-3 mb-5">
+            <h3>توضیحات:</h3>
+            <p>{{ product.description }}</p>
+        </div>
+        <!-- shop details -->
+        <div class="shop-details border-top mt-4 pt-3">
+            <h5 class="text-muted mb-3">اطلاعات فروشگاه</h5>
+            <div class="mb-2">
+                <i class="fas fa-store me-2"></i>
+                <span>نام فروشگاه: {{ shop.title }}</span>
+            </div>
+            <div class="mb-2">
+                <i class="fas fa-map-marker-alt me-2"></i>
+                <span>آدرس: {{ shop.address }}</span>
+            </div>
+            <div class="mb-2">
+                <i class="fas fa-phone me-2"></i>
+                <span>تلفن: {{ shop.phone_number }}</span>
+            </div>
+        </div>
+        <!-- cart btn 
         <form method="post" action="{% url 'cart:add_to_cart' product.id %}">
             {% csrf_token %}
             {{ form }}
             <input type="submit" class="btn btn-primary mt-4" value="افزودن به سبد خرید">
         </form>
+        -->
         <br>
         {% if favorites == 'remove' %}
         <a href="{% url 'shop:remove_from_favorites' product.id %}" class="btn btn-outline-danger mt-5 text-capitalize ">حذف از علاقه مندی ها</a>
@@ -35,7 +67,7 @@
     </div>
 </div>
 <!-- related products -->
-<div class="row mt-4 mb-4">
+<div class="row mt-4 mb-4" dir="rtl">
     <h3>محصولات مرتبط:</h3><hr>
     {% for p in related_products %}
         <!-- dont show the current product in this page -->

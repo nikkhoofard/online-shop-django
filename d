@@ -6,9 +6,13 @@
   <div class="container">
     <div class="row justify-content-center">
       <div class="col-md-8">
-        <!-- استفاده از همان فرم جستجوی base.html -->
-        <form class="col-12 mb-3" action="{% url 'shop:search' %}">
-          <input name="q" type="search" class="form-control form-control-dark" placeholder="جستجوی محصولات..." aria-label="Search">
+        <form class="search-form" method="GET" action="{% url 'home' %}">
+          <div class="input-group">
+            <input type="text" name="q" class="form-control" placeholder="جستجوی محصولات..." aria-label="جستجوی محصولات">
+            <div class="input-group-append">
+              <button class="btn btn-primary" type="submit">جستجو</button>
+            </div>
+          </div>
         </form>
       </div>
     </div>
@@ -16,7 +20,6 @@
 </section>
 
 <!-- بخش محتوای اصلی -->
- 
 <section class="main-content">
   <div class="container">
     {% if products %}
@@ -76,7 +79,7 @@
       <div class="col-md-4">
         <h5>لینک‌های مفید</h5>
         <ul class="list-unstyled">
-          <li><a href="{% url 'shop:home_page' %}" class="text-white">صفحه اصلی</a></li>
+          <li><a href="#" class="text-white">صفحه اصلی</a></li>
           <li><a href="#" class="text-white">محصولات</a></li>
           <li><a href="#" class="text-white">تماس با ما</a></li>
           <li><a href="#" class="text-white">قوانین و مقررات</a></li>
@@ -85,9 +88,9 @@
       <div class="col-md-4">
         <h5>تماس با ما</h5>
         <address>
-          <p><i class="material-icons">place</i> آدرس: تهران، خیابان ولیعصر</p>
-          <p><i class="material-icons">phone</i> تلفن: ۰۲۱-۱۲۳۴۵۶۷۸</p>
-          <p><i class="material-icons">email</i> ایمیل: info@example.com</p>
+          <p><i class="fa fa-map-marker"></i> آدرس: تهران، خیابان ولیعصر</p>
+          <p><i class="fa fa-phone"></i> تلفن: ۰۲۱-۱۲۳۴۵۶۷۸</p>
+          <p><i class="fa fa-envelope"></i> ایمیل: info@example.com</p>
         </address>
       </div>
     </div>

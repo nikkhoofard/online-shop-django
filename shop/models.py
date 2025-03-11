@@ -1,6 +1,6 @@
 from django.db import models
 from django.urls import reverse
-from django.template.defaultfilters import slugify
+from django.utils.text import slugify
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -23,6 +23,10 @@ class Shop(models.Model):
     phone_number = models.CharField(max_length=20)
     admins = models.ManyToManyField(User, related_name='Admins')
 
+
+    def __str__(self):
+        return f"{self.owner.phone_number} - {self.title}"
+
 class Category(models.Model):
     title = models.CharField(max_length=200)
     sub_category = models.ForeignKey(
@@ -30,7 +34,7 @@ class Category(models.Model):
         related_name='sub_categories', null=True, blank=True
     )
     is_sub = models.BooleanField(default=False)
-    slug = models.SlugField(max_length=200, unique=True, allow_unicode=True, default='default-slug')
+    slug = models.SlugField(max_length=200, unique=True, allow_unicode=True)
 
     def __str__(self):
         return self.title or "Untitled Category"
@@ -38,7 +42,7 @@ class Category(models.Model):
     def get_absolute_url(self):
         if not self.slug:
             # Generate a slug if it's empty
-            self.slug = slugify(self.title)
+            self.slug = slugify(self.title, allow_unicode=True)
             if not self.slug:
                 self.slug = f"category-{self.id or 'new'}"
             # Save the object if it has an ID (already exists in the database)
@@ -49,7 +53,7 @@ class Category(models.Model):
     def save(self, *args, **kwargs): # new
         if not self.title:
             self.title = "Untitled Category"
-        self.slug = slugify(self.title)
+        self.slug = slugify(self.title, allow_unicode=True)
         if not self.slug:
             # If slugify returns empty (e.g., for non-Latin characters)
             # Use a default slug with the ID
@@ -94,7 +98,7 @@ class Product(models.Model):
     description = models.TextField()
     price = models.IntegerField()
     date_created = models.DateTimeField(auto_now_add=True)
-    slug = models.SlugField(unique=True, allow_unicode=True, default='default-slug')
+    slug = models.SlugField(unique=True, allow_unicode=True)
 
     compatible_cars = models.ManyToManyField(CarModel, related_name='compatible_products')
     brand = models.CharField(max_length=100, help_text="Brand of the product")
@@ -112,7 +116,7 @@ class Product(models.Model):
     def get_absolute_url(self):
         if not self.slug:
             # Generate a slug if it's empty
-            self.slug = slugify(self.title)
+            self.slug = slugify(self.title, allow_unicode=True)
             if not self.slug:
                 self.slug = f"product-{self.id or 'new'}"
             # Save the object if it has an ID (already exists in the database)
@@ -123,7 +127,7 @@ class Product(models.Model):
     def save(self, *args, **kwargs):
         if not self.title:
             self.title = "Untitled Product"
-        self.slug = slugify(self.title)
+        self.slug = slugify(self.title, allow_unicode=True)
         if not self.slug:
             # If slugify returns empty (e.g., for non-Latin characters)
             # Use a default slug with the ID

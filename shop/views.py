@@ -26,6 +26,25 @@ def home_page(request):
 
 @login_required
 def product_detail(request, slug):
+	product = get_object_or_404(Product, slug=slug)
+	shop = product.shop
+	related_products = Product.objects.filter(category=product.category).all()[:5]
+	context = {
+		'title':product.title,
+		'product':product,
+		'favorites':'favorites',
+		'related_products':related_products,
+		'shop':shop	
+	}
+	if request.user.likes.filter(id=product.id).first():
+		context['favorites'] = 'remove'
+	return render(request, 'product_detail.html', context)
+
+
+#here is the product detail view add when want to add shoping app
+"""
+@login_required
+def product_detail(request, slug):
 	form = QuantityForm()
 	product = get_object_or_404(Product, slug=slug)
 	related_products = Product.objects.filter(category=product.category).all()[:5]
@@ -39,7 +58,7 @@ def product_detail(request, slug):
 	if request.user.likes.filter(id=product.id).first():
 		context['favorites'] = 'remove'
 	return render(request, 'product_detail.html', context)
-
+"""
 
 @login_required
 def add_to_favorites(request, product_id):
