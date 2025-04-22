@@ -7,6 +7,11 @@ from shop.models import Product, Category
 from cart.forms import QuantityForm
 
 
+def categories_processor(request):
+    categories = Category.objects.all()
+    return {'categories': categories}
+
+
 def paginat(request, list_objects):
 	p = Paginator(list_objects, 20)
 	page_number = request.GET.get('page')

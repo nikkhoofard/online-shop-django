@@ -1,0 +1,72 @@
+<div class="mega-menu-container shadow-sm rounded">
+    <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom">
+      <div class="container-fluid px-4">
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCategoryContent" aria-controls="navbarCategoryContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCategoryContent">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item dropdown position-static">
+              <a class="nav-link dropdown-toggle fw-bold text-primary" href="#" id="megaMenuButton" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                دسته بندی ها
+              </a>
+              <div class="dropdown-menu w-100 p-3 border-0 shadow-lg rounded-3" aria-labelledby="megaMenuButton">
+                <div class="row g-4">
+                  {% for category in categories %}
+                    {% if not category.is_sub %}
+                      <div class="col-md-3 mb-3">
+                        <h6 class="fw-bold border-bottom pb-2 mb-2 text-primary">
+                          <a href="{% url 'shop:filter_by_category' category.slug %}" class="text-decoration-none">{{ category }}</a>
+                        </h6>
+                        <ul class="list-unstyled small ps-2">
+                          {% for child in category.sub_categories.all %}
+                            <li class="mb-2 hover-effect">
+                              <a href="{% url 'shop:filter_by_category' child.slug %}" class="text-decoration-none text-secondary d-block py-1 px-2 rounded-pill hover-bg">
+                                <i class="bi bi-chevron-left me-1 small"></i> {{ child }}
+                              </a>
+                            </li>
+                          {% endfor %}
+                        </ul>
+                      </div>
+                      {% if forloop.counter|divisibleby:4 and not forloop.last %}
+                        </div><div class="row g-4">
+                      {% endif %}
+                    {% endif %}
+                  {% endfor %}
+                </div>
+                <div class="row mt-4">
+                  <div class="col-12">
+                    <div class="d-flex justify-content-end">
+                      <a href="#" class="btn btn-sm btn-outline-primary rounded-pill px-3">مشاهده همه دسته‌بندی‌ها</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  </div>
+  
+  <style>
+    /* Additional custom styles */
+    .hover-effect a:hover {
+      color: #0d6efd !important;
+      transform: translateX(-5px);
+      transition: all 0.3s ease;
+    }
+    
+    .hover-bg:hover {
+      background-color: rgba(13, 110, 253, 0.1);
+    }
+    
+    /* RTL support */
+    .dropdown-menu {
+      text-align: right;
+      direction: rtl;
+    }
+    
+    /* Add Bootstrap Icons */
+    @import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css");
+  </style>
