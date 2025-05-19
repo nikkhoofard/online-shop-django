@@ -1,73 +1,181 @@
+{% extends 'base.html' %}
 
-<div class="mega-menu-container shadow-sm rounded">
-    <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom">
-      <div class="container-fluid px-4">
-        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCategoryContent" aria-controls="navbarCategoryContent" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarCategoryContent">
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <li class="nav-item dropdown position-static">
-              <a class="nav-link dropdown-toggle fw-bold text-primary" href="#" id="megaMenuButton" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                دسته بندی ها
-              </a>
-              <div class="dropdown-menu w-100 p-3 border-0 shadow-lg rounded-3" aria-labelledby="megaMenuButton">
-                <div class="row g-4">
-                  {% for category in categories %}
-                    {% if not category.is_sub %}
-                      <div class="col-md-3 mb-3">
-                        <h6 class="fw-bold border-bottom pb-2 mb-2 text-primary">
-                          <a href="{% url 'shop:filter_by_category' category.slug %}" class="text-decoration-none">{{ category }}</a>
-                        </h6>
-                        <ul class="list-unstyled small ps-2">
-                          {% for child in category.sub_categories.all %}
-                            <li class="mb-2 hover-effect">
-                              <a href="{% url 'shop:filter_by_category' child.slug %}" class="text-decoration-none text-secondary d-block py-1 px-2 rounded-pill hover-bg">
-                                <i class="bi bi-chevron-left me-1 small"></i> {{ child }}
-                              </a>
-                            </li>
-                          {% endfor %}
+{% block megamenu %}
+     <!-- Main Navigation -->
+      <nav class="navbar navbar-expand-lg navbar-light bg-white py-0 d-none d-lg-block">
+        <div class="container">
+          <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+
+          <div class="collapse navbar-collapse" id="navbarContent">
+            <!-- Categories Menu -->
+            <ul class="navbar-nav">
+              <li class="nav-item dropdown position-static">
+                <a class="nav-link py-3 text-dark fw-bold dropdown-toggle" href="#" id="categoriesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  <i class="fa fa-bars me-2"></i>
+                  دسته‌بندی کالاها
+                </a>
+                <div class="dropdown-menu mega-menu w-100 p-0" aria-labelledby="categoriesDropdown">
+                  <div class="container">
+                    <div class="row">
+                      <!-- Main Categories Column -->
+                      <div class="col-md-3 border-start py-3">
+                        <ul class="list-unstyled main-categories">
+                          <li class="category-item py-2" data-category="electronics">
+                            <a href="#" class="d-flex justify-content-between align-items-center">
+                              <span><i class="fa fa-laptop me-2"></i> کالای دیجیتال</span>
+                              <i class="fa fa-chevron-left"></i>
+                            </a>
+                          </li>
+                          <li class="category-item py-2" data-category="tools">
+                            <a href="#" class="d-flex justify-content-between align-items-center">
+                              <span><i class="fa fa-tools me-2"></i> ابزار و تجهیزات</span>
+                              <i class="fa fa-chevron-left"></i>
+                            </a>
+                          </li>
+                          <li class="category-item py-2" data-category="fashion">
+                            <a href="#" class="d-flex justify-content-between align-items-center">
+                              <span><i class="fa fa-tshirt me-2"></i> مد و پوشاک</span>
+                              <i class="fa fa-chevron-left"></i>
+                            </a>
+                          </li>
+                          <li class="category-item py-2" data-category="supermarket">
+                            <a href="#" class="d-flex justify-content-between align-items-center">
+                              <span><i class="fa fa-shopping-basket me-2"></i> سوپرمارکت</span>
+                              <i class="fa fa-chevron-left"></i>
+                            </a>
+                          </li>
+                          <li class="category-item py-2" data-category="toys">
+                            <a href="#" class="d-flex justify-content-between align-items-center">
+                              <span><i class="fa fa-gamepad me-2"></i> اسباب بازی و کودک</span>
+                              <i class="fa fa-chevron-left"></i>
+                            </a>
+                          </li>
+                          <li class="category-item py-2" data-category="beauty">
+                            <a href="#" class="d-flex justify-content-between align-items-center">
+                              <span><i class="fa fa-heart me-2"></i> زیبایی و سلامت</span>
+                              <i class="fa fa-chevron-left"></i>
+                            </a>
+                          </li>
+                          <li class="category-item py-2" data-category="home">
+                            <a href="#" class="d-flex justify-content-between align-items-center">
+                              <span><i class="fa fa-couch me-2"></i> خانه و آشپزخانه</span>
+                              <i class="fa fa-chevron-left"></i>
+                            </a>
+                          </li>
+                          <li class="category-item py-2" data-category="books">
+                            <a href="#" class="d-flex justify-content-between align-items-center">
+                              <span><i class="fa fa-book me-2"></i> کتاب و لوازم تحریر</span>
+                              <i class="fa fa-chevron-left"></i>
+                            </a>
+                          </li>
+                          <li class="category-item py-2" data-category="sports">
+                            <a href="#" class="d-flex justify-content-between align-items-center">
+                              <span><i class="fa fa-futbol me-2"></i> ورزش و سفر</span>
+                              <i class="fa fa-chevron-left"></i>
+                            </a>
+                          </li>
                         </ul>
                       </div>
-                      {% if forloop.counter|divisibleby:4 and not forloop.last %}
-                        </div><div class="row g-4">
-                      {% endif %}
-                    {% endif %}
-                  {% endfor %}
-                </div>
-                <div class="row mt-4">
-                  <div class="col-12">
-                    <div class="d-flex justify-content-end">
-                      <a href="#" class="btn btn-sm btn-outline-primary rounded-pill px-3">مشاهده همه دسته‌بندی‌ها</a>
+                      
+                      <!-- Subcategories Column -->
+                      <div class="col-md-9 py-3">
+                        <div class="subcategories-container">
+                          <!-- Electronics Subcategories -->
+                          <div class="subcategory-content" id="electronics">
+                            <div class="row">
+                              <div class="col-md-4">
+                                <h6 class="fw-bold mb-3">موبایل</h6>
+                                <ul class="list-unstyled">
+                                  <li><a href="#" class="text-muted small py-1 d-block">گوشی موبایل</a></li>
+                                  <li><a href="#" class="text-muted small py-1 d-block">کیف و کاور گوشی</a></li>
+                                  <li><a href="#" class="text-muted small py-1 d-block">پاوربانک</a></li>
+                                  <li><a href="#" class="text-muted small py-1 d-block">شارژر موبایل</a></li>
+                                </ul>
+                              </div>
+                              <div class="col-md-4">
+                                <h6 class="fw-bold mb-3">لپ تاپ</h6>
+                                <ul class="list-unstyled">
+                                  <li><a href="#" class="text-muted small py-1 d-block">لپ تاپ و الترابوک</a></li>
+                                  <li><a href="#" class="text-muted small py-1 d-block">لوازم جانبی لپ تاپ</a></li>
+                                  <li><a href="#" class="text-muted small py-1 d-block">کیف لپ تاپ</a></li>
+                                </ul>
+                              </div>
+                              <div class="col-md-4">
+                                <h6 class="fw-bold mb-3">کامپیوتر</h6>
+                                <ul class="list-unstyled">
+                                  <li><a href="#" class="text-muted small py-1 d-block">کامپیوتر همه کاره</a></li>
+                                  <li><a href="#" class="text-muted small py-1 d-block">قطعات داخلی کامپیوتر</a></li>
+                                  <li><a href="#" class="text-muted small py-1 d-block">ماوس</a></li>
+                                  <li><a href="#" class="text-muted small py-1 d-block">کیبورد</a></li>
+                                </ul>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <!-- Tools Subcategories -->
+                          <div class="subcategory-content" id="tools">
+                            <div class="row">
+                              <div class="col-md-4">
+                                <h6 class="fw-bold mb-3">ابزار برقی</h6>
+                                <ul class="list-unstyled">
+                                  <li><a href="#" class="text-muted small py-1 d-block">دریل</a></li>
+                                  <li><a href="#" class="text-muted small py-1 d-block">اره برقی</a></li>
+                                  <li><a href="#" class="text-muted small py-1 d-block">پیچ گوشتی برقی</a></li>
+                                </ul>
+                              </div>
+                              <div class="col-md-4">
+                                <h6 class="fw-bold mb-3">ابزار دستی</h6>
+                                <ul class="list-unstyled">
+                                  <li><a href="#" class="text-muted small py-1 d-block">آچار</a></li>
+                                  <li><a href="#" class="text-muted small py-1 d-block">پیچ گوشتی</a></li>
+                                  <li><a href="#" class="text-muted small py-1 d-block">انبردست</a></li>
+                                </ul>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <!-- Fashion Subcategories -->
+                          <div class="subcategory-content" id="fashion">
+                            <div class="row">
+                              <div class="col-md-4">
+                                <h6 class="fw-bold mb-3">مردانه</h6>
+                                <ul class="list-unstyled">
+                                  <li><a href="#" class="text-muted small py-1 d-block">لباس مردانه</a></li>
+                                  <li><a href="#" class="text-muted small py-1 d-block">کفش مردانه</a></li>
+                                  <li><a href="#" class="text-muted small py-1 d-block">اکسسوری مردانه</a></li>
+                                </ul>
+                              </div>
+                              <div class="col-md-4">
+                                <h6 class="fw-bold mb-3">زنانه</h6>
+                                <ul class="list-unstyled">
+                                  <li><a href="#" class="text-muted small py-1 d-block">لباس زنانه</a></li>
+                                  <li><a href="#" class="text-muted small py-1 d-block">کفش زنانه</a></li>
+                                  <li><a href="#" class="text-muted small py-1 d-block">اکسسوری زنانه</a></li>
+                                </ul>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <!-- Other subcategories would be defined similarly -->
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            </li>
-          </ul>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link py-3" href="#">سوپرمارکت</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link py-3" href="#">پرفروش‌ترین‌ها</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link py-3" href="#">تخفیف‌ها و پیشنهادها</a>
+              </li>
+            </ul>
+          </div>
         </div>
-      </div>
-    </nav>
-  </div>
-  
-  <style>
-    /* Additional custom styles */
-    .hover-effect a:hover {
-      color: #0d6efd !important;
-      transform: translateX(-5px);
-      transition: all 0.3s ease;
-    }
-    
-    .hover-bg:hover {
-      background-color: rgba(13, 110, 253, 0.1);
-    }
-    
-    /* RTL support */
-    .dropdown-menu {
-      text-align: right;
-      direction: rtl;
-    }
-    
-    /* Add Bootstrap Icons */
-    @import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css");
-  </style>
+      </nav>
+{% endblock %}
