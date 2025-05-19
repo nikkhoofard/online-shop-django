@@ -8,7 +8,7 @@ from cart.forms import QuantityForm
 
 
 def categories_processor(request):
-    categories = Category.objects.all()
+    categories = Category._default_manager.all()
     return {'categories': categories}
 
 
@@ -17,7 +17,7 @@ def paginat(request, list_objects):
 	page_number = request.GET.get('page')
 	try:
 		page_obj = p.get_page(page_number)
-	except PageNotAnInteger:
+	except django.core.paginator.PageNotAnInteger:
 		page_obj = p.page(1)
 	except EmptyPage:
 		page_obj = p.page(p.num_pages)
