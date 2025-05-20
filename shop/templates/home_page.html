@@ -163,80 +163,33 @@
         <!--product sample-->
         <section class="main-content">
           <div class="container">
+            {% if products %}
             <div class="row align-items-center justify-content-center">
               <div class="col-12 ">
                 <h1>محصولات</h1>
               </div>
             </div>
             <div class="row">
+            {% for product in products.object_list %}
             <div class="col-md-3 mb-4">
               <div class="card h-100 shadow-sm">
-                <img style="object-fit: cover;" class="card-img-top" height="200" src="pic/wrench_10826173.png" alt="title">
+                <img style="object-fit: cover;" class="card-img-top" height="200" src="{{product.image.url}}" alt="{{product.title}}">
                 <div class="card-body">
-                  <h5 class="card-title">whach</h5>
+                  <h5 class="card-title">{{product.title}}</h5>
                   
                   <div class="d-flex justify-content-between align-items-center mt-3">
-                    <h6 class="m-0 text-success">200 تومن</h6>
-                    <a href="#product" class="btn btn-sm btn-outline-primary">مشاهده جزئیات</a>
+                    <h6 class="m-0 text-success">{{product.price}} تومن</h6>
+                    <a href="{{product.get_absolute_url }}" class="btn btn-sm btn-outline-primary">مشاهده جزئیات</a>
                   </div>
                 </div>
               </div>
             </div>
-            <div class="col-md-3 mb-4">
-              <div class="card h-100 shadow-sm">
-                <img style="object-fit: cover;" class="card-img-top" height="200" src="pic/wrench_10826173.png" alt="title">
-                <div class="card-body">
-                  <h5 class="card-title">whach</h5>
-                  
-                  <div class="d-flex justify-content-between align-items-center mt-3">
-                    <h6 class="m-0 text-success">200 تومن</h6>
-                    <a href="#product" class="btn btn-sm btn-outline-primary">مشاهده جزئیات</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-3 mb-4">
-              <div class="card h-100 shadow-sm">
-                <img style="object-fit: cover;" class="card-img-top" height="200" src="pic/wrench_10826173.png" alt="title">
-                <div class="card-body">
-                  <h5 class="card-title">whach</h5>
-                  
-                  <div class="d-flex justify-content-between align-items-center mt-3">
-                    <h6 class="m-0 text-success">200 تومن</h6>
-                    <a href="#product" class="btn btn-sm btn-outline-primary">مشاهده جزئیات</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-3 mb-4">
-              <div class="card h-100 shadow-sm">
-                <img style="object-fit: cover;" class="card-img-top" height="200" src="pic/wrench_10826173.png" alt="title">
-                <div class="card-body">
-                  <h5 class="card-title">whach</h5>
-                  
-                  <div class="d-flex justify-content-between align-items-center mt-3">
-                    <h6 class="m-0 text-success">200 تومن</h6>
-                    <a href="#product" class="btn btn-sm btn-outline-primary">مشاهده جزئیات</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-3 mb-4">
-              <div class="card h-100 shadow-sm">
-                <img style="object-fit: cover;" class="card-img-top" height="200" src="pic/wrench_10826173.png" alt="title">
-                <div class="card-body">
-                  <h5 class="card-title">whach</h5>
-                  
-                  <div class="d-flex justify-content-between align-items-center mt-3">
-                    <h6 class="m-0 text-success">200 تومن</h6>
-                    <a href="#product" class="btn btn-sm btn-outline-primary">مشاهده جزئیات</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            </div>
+            {%endfor%}
+            {# Add the missing endif tag here #}
+            {% endif %}
+          
+          </div>
         </div>
         </section> 
-    
-    
+      
 {% endblock %}
