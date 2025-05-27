@@ -113,6 +113,7 @@ def verify_code(request):
     if request.method == 'POST':
         user_code = request.POST.get('code')
         stored_code = request.session.get('verification_code')
+      
         phone_number = request.session.get('phone_number')
 
         if not phone_number or not stored_code:
@@ -187,6 +188,7 @@ def signup(request):
             # Save phone number and verification code in session
             request.session['phone_number'] = phone_number
             request.session['verification_code'] = verification_code
+            print(f'storecode is :{verification_code}')
             request.session.set_expiry(600)
             send_verification_code(str(phone_number), verification_code) 
             return redirect('accounts:verify_code')
