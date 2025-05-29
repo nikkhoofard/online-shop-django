@@ -1,19 +1,23 @@
-from django.shortcuts import render, redirect
-from django.contrib import messages
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from django.views.decorators.csrf import csrf_protect
+from django.core.exceptions import ValidationError
+from django.contrib.auth.password_validation import validate_password
+from django.db import IntegrityError
+from django.utils.crypto import get_random_string
+from django.utils import timezone
+from django.urls import reverse
+from django.http import JsonResponse
 
 from dashboard.views import is_manager
 from .forms import UserRegistrationForm, UserLoginForm, ManagerLoginForm, EditProfileForm, SignUpForm
 from accounts.models import User
-from django.contrib.auth import login, get_user_model
-from django.contrib.auth.password_validation import validate_password
-from django.core.exceptions import ValidationError
+from django.contrib.auth import get_user_model
 from django.conf import settings
 from .utils import send_verification_code
 import random
-from django.db import IntegrityError
-from django.contrib.auth.password_validation import validate_password
 
 
 def create_manager():
@@ -113,17 +117,24 @@ def verify_code(request):
     if request.method == 'POST':
         user_code = request.POST.get('code')
         stored_code = request.session.get('verification_code')
-      
         phone_number = request.session.get('phone_number')
+        
+        print(f"Received code: {user_code}, Stored code: {stored_code}")
 
         if not phone_number or not stored_code:
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({'error': 'Session expired. Please try again.', 'redirect_url': '/accounts/signup/'})
             return redirect('accounts:signup')  # Prevent direct access without session data
 
         if user_code == stored_code:
             # Mark phone as verified and move to password setup
             request.session['verified_phone'] = phone_number
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({'success': True, 'redirect_url': '/accounts/set_password/'})
             return redirect('accounts:set_password')
         
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({'error': 'Invalid code'})
         return render(request, 'verify_code.html', {'error': 'Invalid code'})
     
     return render(request, 'verify_code.html')

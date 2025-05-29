@@ -42,6 +42,8 @@
               <!-- فرم کد تایید -->
               <form id="verificationForm" method="post" action="{% url 'accounts:verify_code' %}">
                 {% csrf_token %}
+                <!-- Hidden field for combined code -->
+                <input type="hidden" name="code" id="combined_code" value="">
 
                 <!-- فیلد کد تایید -->      
 
@@ -51,11 +53,15 @@
             <input type="text" name="code2" class="verification-code-input form-control text-center mx-1" maxlength="1" autocomplete="off">
             <input type="text" name="code3" class="verification-code-input form-control text-center mx-1" maxlength="1" autocomplete="off">
             <input type="text" name="code4" class="verification-code-input form-control text-center mx-1" maxlength="1" autocomplete="off">
-          
+           
                   </div>
                   
-                  <div class="invalid-feedback text-center" id="codeError">
-                    کد وارد شده صحیح نیست
+                  <div class="text-danger text-center d-none" id="codeError">
+                    {% if error %}
+                      {{ error }}
+                    {% else %}
+                      کد وارد شده صحیح نیست
+                    {% endif %}
                   </div>
                   
                   <!-- تایمر ارسال مجدد -->
@@ -93,13 +99,20 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"></script>
     
     <script>
-      $(document).ready(function() {
-        // نمایش شماره موبایل از URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const phone = urlParams.get('phone');
-        if (phone) {
-          $('#userPhone').text(phone);
-        }
+       $(document).ready(function() {
+         // نمایش شماره موبایل از URL
+         const urlParams = new URLSearchParams(window.location.search);
+         const phone = urlParams.get('phone');
+         if (phone) {
+           $('#userPhone').text(phone);
+         }
+         
+         // Show error message if it exists
+          {% if error %}
+            $('.verification-code-input').addClass('is-invalid');
+            $('#codeError').removeClass('d-none').show();
+            console.log('Error from backend:', '{{ error }}');
+          {% endif %}
         
         // تنظیم فوکوس روی اولین فیلد
         $('.verification-code-input:first').focus();
@@ -172,45 +185,77 @@
         
         // اعتبارسنجی و ارسال فرم
         $('#verificationForm').on('submit', function(e) {
-          e.preventDefault();
-
-
+          e.preventDefault(); // Prevent normal form submission
+          
+          // Combine the code digits before submitting
           const code = Array.from($('.verification-code-input'))
                      .map(input => input.value)
                      .join('');
-                     if (code.length !== 4) {
-        $('.verification-code-input').addClass('is-invalid');
-        $('#codeError').show();
-        return false;
-    }
-
-    $.ajax({
-        url: $(this).attr('action'),
-        method: 'POST',
-        data: {
-            'code': code,
-            'csrfmiddlewaretoken': $('input[name=csrfmiddlewaretoken]').val()
-        },
-        success: function(response) {
-            if (response.success) {
-                window.location.href = '/dashboard/';
-            } else {
+                     
+          if (code.length !== 4) {
+            $('.verification-code-input').addClass('is-invalid');
+            $('#codeError').removeClass('d-none').show();
+            return false;
+          }
+          
+          // Set the combined code to the hidden field
+          $('#combined_code').val(code);
+          
+          // For debugging - log the code value
+          console.log('Submitting code:', code);
+          console.log('Form action:', $(this).attr('action'));
+          console.log('CSRF token:', $('input[name=csrfmiddlewaretoken]').val());
+          
+          // Submit the form using AJAX
+          $.ajax({
+            url: $(this).attr('action'),
+            method: 'POST',
+            data: {
+              'code': code,
+              'csrfmiddlewaretoken': $('input[name=csrfmiddlewaretoken]').val()
+            },
+            success: function(response) {
+              console.log('Response received:', response);
+              if (response.success) {
+                window.location.href = response.redirect_url || '/accounts/set_password/';
+              } else if (response.error) {
                 $('.verification-code-input').addClass('is-invalid');
-                $('#codeError').text(response.error).show();
+                $('#codeError').removeClass('d-none').text(response.error).show();
+              } else if (response.redirect_url) {
+                window.location.href = response.redirect_url;
+              } else {
+                // If we got HTML response, we're being redirected
+                window.location.reload();
+              }
+            },
+            error: function(xhr, status, error) {
+              console.error('Error:', status, error);
+              $('.verification-code-input').addClass('is-invalid');
+              $('#codeError').removeClass('d-none').text('خطا در ارتباط با سرور').show();
             }
-        },
-        error: function(xhr) {
-            $('#codeError').text('خطا در ارتباط با سرور').show();
-        }
-    });
-});
+          });
+          
+          return false; // Prevent normal form submission
+        });
         
-        // حذف کلاس خطا هنگام تایپ
+        // Make sure the code inputs are properly initialized
         $('.verification-code-input').on('input', function() {
-          $('.verification-code-input').removeClass('is-invalid');
-          $('#codeError').hide();
+          // Update the hidden field whenever any digit changes
+          const code = Array.from($('.verification-code-input'))
+                     .map(input => input.value)
+                     .join('');
+          $('#combined_code').val(code);
+          
+          // Remove error styling when user starts typing again
+          if ($(this).hasClass('is-invalid')) {
+            $('.verification-code-input').removeClass('is-invalid');
+            $('#codeError').addClass('d-none').hide();
+          }
         });
       });
+        
+        // Event handler for removing error styling is now integrated in the code above
+      
     </script>
   </body>
 </html>
