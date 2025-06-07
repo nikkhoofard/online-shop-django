@@ -92,6 +92,7 @@ def user_login(request):
                 )
                 return redirect('accounts:user_login')
     else:
+        print("eeeeeeeeeeroooooreeeeeeeeeee")
         form = UserLoginForm()
     context = {'title':'Login', 'form': form}
     return render(request, 'login.html', context)

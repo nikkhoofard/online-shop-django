@@ -64,15 +64,19 @@ class SignUpForm(forms.Form):
 class UserLoginForm(forms.Form):
     phone_number = forms.CharField(
         widget=forms.TextInput(
-            attrs={'class': 'form-control', 'placeholder': 'Phone Number', 'type': 'tel'}
+            attrs={
+                'class': 'form-control', 
+                'placeholder': '۰۹۱۲۳۴۵۶۷۸۹', 
+                'type': 'tel',
+                'dir': 'ltr'
+            }
         ),
         max_length=20,
         required=True)
     
     password = forms.CharField(
         widget=forms.PasswordInput(
-            attrs={'class': 'form-control', 'placeholder': 'password'},
-
+            attrs={'class': 'form-control', 'placeholder': 'رمز عبور خود را وارد کنید'},
         ),
         required=True
     )
@@ -80,10 +84,25 @@ class UserLoginForm(forms.Form):
     def clean_phone_number(self):
         phone_number = self.cleaned_data.get('phone_number')
         if phone_number:
-            # Basic validation:  Allow digits, spaces, +, and -
-            pattern = r"^[\d\s\+\-]+$"  #Raw string to prevent escaping backslashes
+            # تبدیل اعداد فارسی/عربی به انگلیسی
+            phone_number = ''.join([chr(ord(c) - 1728) if '۰' <= c <= '۹' else c for c in phone_number])
+            
+            # حذف فاصله‌ها و خط تیره‌ها
+            phone_number = re.sub(r'[\s\-]', '', phone_number)
+            
+            # اگر با صفر شروع می‌شود، صفر را حذف کرده و +98 اضافه می‌کنیم
+            if phone_number.startswith('0'):
+                phone_number = '+98' + phone_number[1:]
+            else:
+                # اگر با صفر شروع نمی‌شود، بررسی می‌کنیم که آیا با +98 شروع می‌شود یا نه
+                if not phone_number.startswith('+98'):
+                    phone_number = '+98' + phone_number
+            
+            # بررسی اعتبار شماره تلفن
+            pattern = r"^\+98\d{10}$"  # شماره تلفن ایران با فرمت +98 و 10 رقم
             if not re.match(pattern, phone_number):
-                raise forms.ValidationError("Invalid phone number format.")
+                raise forms.ValidationError("لطفا یک شماره موبایل معتبر وارد کنید (مثال: ۰۹۱۲۳۴۵۶۷۸۹)")
+        
         return phone_number
 
 
