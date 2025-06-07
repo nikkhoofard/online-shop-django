@@ -150,7 +150,8 @@ def set_password(request):
     if request.method == 'POST':
         password = request.POST.get('password')
         password_confirm = request.POST.get('password_confirm')
-        is_manager = request.POST.get('is_manager')
+        is_manager = bool(request.POST.get('is_manager'))
+        print(f"us :{is_manager}")
         error = None
 
         try:
@@ -172,7 +173,7 @@ def set_password(request):
 
             request.session.flush()
             login(request, user)
-            return redirect('accounts:shop:home_page')
+            return redirect('shop:home_page')
 
         except ValidationError as e:
             error = e.messages[0] if e.messages else "Invalid password"

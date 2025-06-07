@@ -39,21 +39,32 @@
 
             <!-- User Actions -->
             <div class="col-auto d-none d-lg-flex align-items-center">
-              <div class="align-items-center border-start ps-3 me-3">
+              <div class="d-flex align-items-center border-start ps-3 me-3">
                 {%if request.user.is_authenticated %}
-                <div class="d-flex align-items-center border-end pe-3">
-                  <a href="{% url 'profile' %}" class="text-decoration-none text-dark d-flex align-items-center">
-                    <i class="bi bi-person-circle fs-4"></i>
-                    <span class="ms-2">{{ request.user.username }}</span>
-                  </a>
-                </div>
-                <div class="position-relative ms-3">
-                  <a href="{% url 'cart' %}" class="text-decoration-none text-dark">
-                    <i class="bi bi-cart fs-4"></i>
-                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                      {% if cart_count %}{{ cart_count }}{% else %}0{% endif %}
-                    </span>
-                  </a>
+                <div class="d-flex align-items-center">
+                  <div class="dropdown me-3">
+                    <a href="#" class="text-decoration-none text-dark d-flex align-items-center dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                      <i class="bi bi-person-circle fs-4"></i>
+                      <span class="ms-2">{{ request.user.phone_number }}</span>
+                    </a>
+                    <ul class="dropdown-menu">
+                      <li><a href="{% url 'shop:favorites' %}" class="dropdown-item">علاقه مندی ها</a></li>
+                      <li><hr class="dropdown-divider"></li>
+                      <li><a href="{% url 'orders:user_orders' %}" class="dropdown-item">سفارشات</a></li>
+                      <li><hr class="dropdown-divider"></li>
+                      <li><a class="dropdown-item" href="{% url 'accounts:edit_profile' %}">ویرایش پروفایل</a></li>
+                      <li><hr class="dropdown-divider"></li>
+                      <li><a class="dropdown-item text-danger" href="{% url 'accounts:user_logout' %}">خروج</a></li>
+                    </ul>
+                  </div>
+                  <div class="position-relative">
+                    <a href="{% url 'cart:show_cart' %}" class="text-decoration-none text-dark">
+                      <i class="bi bi-cart fs-4"></i>
+                      <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                        {% if cart_count %}{{ cart_count }}{% else %}0{% endif %}
+                      </span>
+                    </a>
+                  </div>
                 </div>
                 {%else %}
                 <a href="{% url 'accounts:signup' %}">
