@@ -282,19 +282,19 @@
     <div class="container">
       <ul class="navbar-nav w-100 d-flex flex-row justify-content-around">
         <li class="nav-item">
-          <a href="index.html" class="nav-link active d-flex flex-column align-items-center">
+          <a href="{% url 'shop:home_page' %}" class="nav-link active d-flex flex-column align-items-center">
             <i class="bi bi-house-door"></i>
             <span class="small">خانه</span>
           </a>
         </li>
         <li class="nav-item">
-          <a href="#" class="nav-link d-flex flex-column align-items-center">
+          <a href="{% url 'cart:show_cart' %}" class="nav-link d-flex flex-column align-items-center">
             <i class="bi bi-cart"></i>
             <span class="small">سبد خرید</span>
           </a>
         </li>
         <li class="nav-item">
-          <a href="#" class="nav-link d-flex flex-column align-items-center">
+          <a href="{% url 'shop:favorites' %}" class="nav-link d-flex flex-column align-items-center">
             <i class="bi bi-heart"></i>
             <span class="small">علاقه‌مندی‌ها</span>
           </a>
@@ -306,7 +306,7 @@
           </a>
         </li>
         <li class="nav-item">
-          <a href="#" class="nav-link d-flex flex-column align-items-center">
+          <a href="{% url 'accounts:edit_profile' %}" class="nav-link d-flex flex-column align-items-center">
             <i class="bi bi-person"></i>
             <span class="small">پروفایل</span>
           </a>
