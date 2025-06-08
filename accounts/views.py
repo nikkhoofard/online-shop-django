@@ -218,6 +218,7 @@ def reset_password(request):
             # Save phone number and verification code in session
             request.session['phone_number'] = phone_number
             request.session['verification_code'] = verification_code
+            print(f'storecode is :{verification_code}')
             request.session.set_expiry(600)
             send_verification_code(str(phone_number), verification_code)
             return redirect('accounts:verify_reset_code')
@@ -233,16 +234,21 @@ def verify_reset_code(request):
         phone_number = request.session.get('phone_number')
 
         if not phone_number or not stored_code:
-            return redirect('accounts:reset_password')  # Prevent direct access without session data
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({'error': 'جلسه منقضی شده است. دوباره تلاش کنید.', 'redirect_url': '/accounts/reset_password/'})
+            return redirect('accounts:reset_password')
 
         if user_code == stored_code:
-            # Mark phone as verified and move to password setup
             request.session['verified_phone'] = phone_number
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({'success': True, 'redirect_url': '/accounts/set_new_password/'})
             return redirect('accounts:set_new_password')
 
-        return render(request, 'verify_code.html', {'error': 'Invalid code'})
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({'error': 'کد وارد شده صحیح نیست'})
+        return render(request, 'verify_reset_code.html', {'error': 'کد وارد شده صحیح نیست'})
 
-    return render(request, 'verify_code.html')
+    return render(request, 'verify_reset_code.html')
 
 
 @csrf_protect

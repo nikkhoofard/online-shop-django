@@ -74,6 +74,13 @@ class UserLoginForm(forms.Form):
         max_length=15,
         required=True
     )
+
+    password = forms.CharField(
+        widget=forms.PasswordInput(
+            attrs={'class': 'form-control', 'placeholder': 'رمز عبور خود را وارد کنید'}
+        )
+    )
+
     
     def clean_phone_number(self):
         phone_number = self.cleaned_data.get('phone_number')
