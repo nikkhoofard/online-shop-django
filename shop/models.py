@@ -99,7 +99,10 @@ class Product(models.Model):
     price = models.IntegerField()
     date_created = models.DateTimeField(auto_now_add=True)
     slug = models.SlugField(unique=True, allow_unicode=True)
-
+    is_active = models.BooleanField(default=True)
+    is_deleted = models.BooleanField(default=False)
+    color = models.CharField(max_length=100, help_text="Color of the product", default="balck")
+    number_of_sales = models.PositiveIntegerField(default=0)
     compatible_cars = models.ManyToManyField(CarModel, related_name='compatible_products')
     brand = models.CharField(max_length=100, help_text="Brand of the product")
     manufacturer = models.CharField(max_length=100, help_text="Company that manufactured the product")
