@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     'shop.apps.ShopConfig',
     'dashboard.apps.DashboardConfig',
     'phonenumber_field',
+    'django.contrib.humanize',
     
 ]
 

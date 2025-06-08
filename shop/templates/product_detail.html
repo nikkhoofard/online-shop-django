@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-
+{% load humanize %}
 {% block content %}
     <!-- Breadcrumb -->
     <div class="container mt-3">
@@ -103,18 +103,14 @@
                   </li>
                   <li class="d-flex mb-2">
                     <span class="text-muted">مناسب برای خودرو:</span>
-                    <span class="me-2">پراید صبا</span>
-                  </li>
-                  <li class="d-flex mb-2">
-                    <span class="text-muted">جنس:</span>
-                    <span class="me-2">پلاستیک</span>
+                    <span class="me-2">{{product.compatible_cars.all|join:", "}}</span>
                   </li>
                 </ul>
               </div>
               
               <!-- Product Colors -->
               <div class="mb-4">
-                <h6 class="fw-bold mb-3">رنگ: <span class="fw-normal">مشکی</span></h6>
+                <h6 class="fw-bold mb-3">رنگ: <span class="fw-normal">{{product.color}}</span></h6>
                 <div class="d-flex">
                   <div class="color-option me-2 border rounded-circle p-1 active">
                     <span class="d-block rounded-circle bg-dark"></span>
@@ -130,7 +126,7 @@
                 <div class="d-flex align-items-center mb-2">
                   <i class="fas fa-store text-primary me-2"></i>
                   <span class="fw-bold">فروشنده:</span>
-                  <span class="me-2">فروشگاه قطعات خودرو</span>
+                  <span class="me-2">{{product.shop.title}}</span>
                 </div>
                 <div class="d-flex align-items-center mb-2">
                   <i class="fas fa-medal text-warning me-2"></i>
@@ -152,28 +148,53 @@
               <!-- Price Section -->
               <div class="mb-4">
                 <div class="d-flex justify-content-between align-items-center mb-2">
-                  <span class="text-muted text-decoration-line-through">۱,۲۰۰,۰۰۰ تومان</span>
-                  <span class="badge bg-danger">۱۵٪</span>
+                  {% if product.discount_price %}
+                    <span class="text-muted text-decoration-line-through">{{ product.price|intcomma }} تومان</span>
+                    <span class="badge bg-danger">تخفیف</span>
+                  {% else %}
+                    <span class="fw-bold fs-5">{{ product.price|intcomma }} تومان</span>
+                  {% endif %}
                 </div>
                 <div class="d-flex justify-content-between align-items-center">
-                  <span class="fw-bold fs-5">۱,۰۲۰,۰۰۰ تومان</span>
+                  <span class="fw-bold fs-5">
+                    {% if product.discount_price %}
+                      {{ product.discount_price|intcomma }} تومان
+                    {% else %}
+                      {{ product.price|intcomma }} تومان
+                    {% endif %}
+                  </span>
                 </div>
               </div>
               
               <!-- Warranty -->
               <div class="mb-4">
+                {% if product.has_warranty %}
                 <div class="d-flex align-items-center">
                   <i class="fas fa-shield-alt text-success me-2"></i>
-                  <span>گارانتی ۱۸ ماهه</span>
-                </div>
+                  <span>{{product.warranty}} ماهه</span>
+                  </div>
+                {% else %}
+                  <div class="d-flex align-items-center">
+                    <i class="fas fa-times-circle text-danger me-2"></i>
+                    <span>گارانتی ندارد</span>
+                  </div>
+                {% endif %}
+
               </div>
               
               <!-- Stock Status -->
               <div class="mb-4">
-                <div class="d-flex align-items-center text-success">
-                  <i class="fas fa-check-circle me-2"></i>
-                  <span>موجود در انبار</span>
-                </div>
+                {% if product.is_active %}
+                  <div class="d-flex align-items-center text-success">
+                    <i class="fas fa-check-circle me-2"></i>
+                    <span>موجود در انبار</span>
+                  </div>
+                {% else %}
+                  <div class="d-flex align-items-center text-danger">
+                    <i class="fas fa-times-circle me-2"></i>
+                    <span>ناموجود</span>
+                  </div>
+                {% endif %}
               </div>
               
               <!-- Quantity -->
@@ -231,16 +252,7 @@
                 <!-- Description Tab -->
                 <div class="tab-pane fade show active" id="description" role="tabpanel" aria-labelledby="description-tab">
                   <h5 class="fw-bold mb-3">معرفی محصول</h5>
-                  <p>صفحه کیلومتر شمار خودرو مدل DAANJECTOR مناسب پراید صبا یکی از قطعات مهم خودرو است که وظیفه نمایش سرعت، مسافت طی شده و سایر اطلاعات مهم را بر عهده دارد. این محصول با کیفیت بالا و دقت عالی، جایگزین مناسبی برای قطعه اصلی خودرو است.</p>
-                  <p>این صفحه کیلومتر از جنس پلاستیک با کیفیت ساخته شده و دارای نشانگرهای واضح و خوانا است. نصب آن بسیار ساده بوده و نیازی به تغییرات اضافی در داشبورد خودرو ندارد.</p>
-                  <p>از ویژگی‌های مهم این محصول می‌توان به موارد زیر اشاره کرد:</p>
-                  <ul>
-                    <li>طراحی دقیق و مطابق با نمونه اصلی</li>
-                    <li>کیفیت ساخت بالا</li>
-                    <li>دوام و ماندگاری طولانی</li>
-                    <li>نمایش دقیق اطلاعات</li>
-                    <li>قابلیت نصب آسان</li>
-                  </ul>
+                  <p>{{product.description}}</p>
                 </div>
                 
                 <!-- Specifications Tab -->
@@ -251,15 +263,11 @@
                       <tbody>
                         <tr>
                           <th scope="row" class="bg-light">برند</th>
-                          <td>DAANJECTOR</td>
-                        </tr>
-                        <tr>
-                          <th scope="row" class="bg-light">نوع</th>
-                          <td>آنالوگ</td>
+                          <td>{{product.brand}}</td>
                         </tr>
                         <tr>
                           <th scope="row" class="bg-light">مناسب برای خودرو</th>
-                          <td>پراید صبا</td>
+                          <td>{{product.compatible_cars.all|join:", "}}</td>
                         </tr>
                         <tr>
                           <th scope="row" class="bg-light">جنس</th>
@@ -267,7 +275,7 @@
                         </tr>
                         <tr>
                           <th scope="row" class="bg-light">رنگ</th>
-                          <td>مشکی</td>
+                          <td>{{product.color}}</td>
                         </tr>
                         <tr>
                           <th scope="row" class="bg-light">ابعاد</th>
