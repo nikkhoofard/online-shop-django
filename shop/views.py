@@ -2,6 +2,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.paginator import Paginator
+from django.db.models import Q
+from django.http import JsonResponse
 
 from shop.models import Product, Category
 from cart.forms import QuantityForm
@@ -87,31 +89,59 @@ def favorites(request):
 
 
 def search(request):
-	query = request.GET.get('q')
-	products = Product.objects.filter(title__icontains=query).all()
-	context = {'products': paginat(request ,products)}
+	query = request.GET.get('q', '').strip()
+	products = Product.objects.none()
+	message = ''
+	if query:
+		products = Product.objects.filter(
+			Q(title__icontains=query) |
+			Q(description__icontains=query) |
+			Q(brand__icontains=query) |
+			Q(manufacturer__icontains=query)
+		).distinct()
+		if not products.exists():
+			message = "محصولی با این مشخصات پیدا نشد."
+	else:
+		message = "لطفاً عبارت مورد نظر خود را وارد کنید."
+	context = {
+		'products': paginat(request, products),
+		'query': query,
+		'message': message,
+	}
 	return render(request, 'home_page.html', context)
+
+
 
 
 def filter_by_category(request, slug):
-	"""when user clicks on parent category
-	we want to show all products in its sub-categories too
-	"""
-	result = []
-	category = Category.objects.filter(slug=slug).first()
-	[result.append(product) \
-		for product in Product.objects.filter(category=category.id).all()]
-	# check if category is parent then get all sub-categories
-	if not category.is_sub:
-		sub_categories = category.sub_categories.all()
-		# get all sub-categories products 
-		for category in sub_categories:
-			[result.append(product) \
-				for product in Product.objects.filter(category=category).all()]
-	context = {'products': paginat(request ,result)}
-	return render(request, 'home_page.html', context)
+    category = Category.objects.filter(slug=slug).first()
+    if not category:
+        context = {'products': []}
+        return render(request, 'home_page.html', context)
+    category_ids = get_all_subcategory_ids(category)
+    products = Product.objects.filter(category_id__in=category_ids)
+    context = {'products': paginat(request, products)}
+    return render(request, 'home_page.html', context)
+
 
 
 def categories_processor(request):
 	main_categories = Category.objects.filter(is_sub=False).all()
 	return {'main_categories': main_categories}
+
+
+def search_suggestions(request):
+    query = request.GET.get('q', '').strip()
+    results = []
+    if query:
+        products = Product.objects.filter(title__icontains=query)[:10]
+        results = list(products.values('id', 'title'))
+    return JsonResponse({'results': results})
+
+
+
+def get_all_subcategory_ids(category):
+    ids = [category.id]
+    for sub in category.sub_categories.all():
+        ids.extend(get_all_subcategory_ids(sub))
+    return ids

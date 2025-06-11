@@ -12,4 +12,5 @@ urlpatterns = [
 	path('favorites/', views.favorites, name='favorites'),
 	path('search/', views.search, name='search'),
 	re_path(r'^filter/(?P<slug>[-\w]+)/$', views.filter_by_category, name='filter_by_category'),
+	path('search-suggestions/', views.search_suggestions, name='search_suggestions'),
 ]

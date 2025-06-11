@@ -30,12 +30,15 @@
 
             <!-- Search Bar -->
             <div class="col-12 col-lg d-flex justify-content-center">
-              <div class="input-group w-100" style="max-width:500px;">
-                <input type="search" class="form-control rounded-end-0 bg-light" placeholder="جستجو در محصولات..." aria-label="Search">
-                <button class="btn btn-light border rounded-start-0" type="button" href="serachResult.html">
-                  <i class="fa fa-search text-muted"></i>
-                </button>
-              </div>
+              <form class="w-100 position-relative" style="max-width:500px;" method="get" action="{% url 'shop:search' %}">
+                <div class="input-group">
+                  <input type="search" id="search-input" name="q" class="form-control rounded-end-0 bg-light" placeholder="جستجو در محصولات..." aria-label="Search" autocomplete="off" value="{{ query|default:'' }}">
+                  <button class="btn btn-light border rounded-start-0" type="submit">
+                    <i class="fa fa-search text-muted"></i>
+                  </button>
+                </div>
+                <div id="search-suggestions" class="list-group position-absolute w-100" style="z-index: 2000; top: 100%;"></div>
+              </form>
             </div>
 
             <!-- User Actions -->
@@ -269,6 +272,41 @@
           $(this).find('.dropdown-menu').addClass('show');
         }).on('mouseleave', function() {
           $(this).find('.dropdown-menu').removeClass('show');
+        });
+
+        var $input = $('#search-input');
+        var $suggestions = $('#search-suggestions');
+
+        $input.on('input', function() {
+          var query = $(this).val();
+          if (query.length < 2) {
+            $suggestions.empty().hide();
+            return;
+          }
+          $.ajax({
+            url: "{% url 'shop:search_suggestions' %}",
+            data: {q: query},
+            success: function(data) {
+              $suggestions.empty();
+              if (data.results.length > 0) {
+                data.results.forEach(function(item) {
+                  $suggestions.append(
+                    '<a href="/product/' + item.id + '/" class="list-group-item list-group-item-action">' + item.title + '</a>'
+                  );
+                });
+                $suggestions.show();
+              } else {
+                $suggestions.hide();
+              }
+            }
+          });
+        });
+
+        // بستن پیشنهادها هنگام کلیک بیرون
+        $(document).on('click', function(e) {
+          if (!$(e.target).closest('#search-input, #search-suggestions').length) {
+            $suggestions.hide();
+          }
         });
       });
 
