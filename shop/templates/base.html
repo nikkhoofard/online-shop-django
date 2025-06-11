@@ -1,4 +1,5 @@
 {% load static %}
+{% load category_tags %}
 <!doctype html>
 <html lang="fa" dir="rtl">
   <head>
@@ -89,7 +90,9 @@
               <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
                 <span class="navbar-toggler-icon"></span>
               </button>
+
     
+  
               <div class="collapse navbar-collapse" id="navbarContent">
                 <!-- Categories Menu -->
                 <ul class="navbar-nav">
@@ -104,143 +107,46 @@
                           <!-- Main Categories Column -->
                           <div class="col-md-3 border-start py-3">
                             <ul class="list-unstyled main-categories">
-                              <li class="category-item py-2" data-category="electronics">
-                                <a href="#" class="d-flex justify-content-between align-items-center">
-                                  <span><i class="fa fa-laptop me-2"></i> کالای دیجیتال</span>
-                                  <i class="fa fa-chevron-left"></i>
-                                </a>
-                              </li>
-                              <li class="category-item py-2" data-category="tools">
-                                <a href="#" class="d-flex justify-content-between align-items-center">
-                                  <span><i class="fa fa-tools me-2"></i> ابزار و تجهیزات</span>
-                                  <i class="fa fa-chevron-left"></i>
-                                </a>
-                              </li>
-                              <li class="category-item py-2" data-category="fashion">
-                                <a href="#" class="d-flex justify-content-between align-items-center">
-                                  <span><i class="fa fa-tshirt me-2"></i> مد و پوشاک</span>
-                                  <i class="fa fa-chevron-left"></i>
-                                </a>
-                              </li>
-                              <li class="category-item py-2" data-category="supermarket">
-                                <a href="#" class="d-flex justify-content-between align-items-center">
-                                  <span><i class="fa fa-shopping-basket me-2"></i> سوپرمارکت</span>
-                                  <i class="fa fa-chevron-left"></i>
-                                </a>
-                              </li>
-                              <li class="category-item py-2" data-category="toys">
-                                <a href="#" class="d-flex justify-content-between align-items-center">
-                                  <span><i class="fa fa-gamepad me-2"></i> اسباب بازی و کودک</span>
-                                  <i class="fa fa-chevron-left"></i>
-                                </a>
-                              </li>
-                              <li class="category-item py-2" data-category="beauty">
-                                <a href="#" class="d-flex justify-content-between align-items-center">
-                                  <span><i class="fa fa-heart me-2"></i> زیبایی و سلامت</span>
-                                  <i class="fa fa-chevron-left"></i>
-                                </a>
-                              </li>
-                              <li class="category-item py-2" data-category="home">
-                                <a href="#" class="d-flex justify-content-between align-items-center">
-                                  <span><i class="fa fa-couch me-2"></i> خانه و آشپزخانه</span>
-                                  <i class="fa fa-chevron-left"></i>
-                                </a>
-                              </li>
-                              <li class="category-item py-2" data-category="books">
-                                <a href="#" class="d-flex justify-content-between align-items-center">
-                                  <span><i class="fa fa-book me-2"></i> کتاب و لوازم تحریر</span>
-                                  <i class="fa fa-chevron-left"></i>
-                                </a>
-                              </li>
-                              <li class="category-item py-2" data-category="sports">
-                                <a href="#" class="d-flex justify-content-between align-items-center">
-                                  <span><i class="fa fa-futbol me-2"></i> ورزش و سفر</span>
-                                  <i class="fa fa-chevron-left"></i>
-                                </a>
-                              </li>
+                              {% for category in main_categories %}
+                                <li class="category-item py-2" data-category="cat{{ category.id }}">
+                                  <a href="{{ category.get_absolute_url }}" class="d-flex justify-content-between align-items-center">
+                                    <span>{{ category.title }}</span>
+                                    <i class="fa fa-chevron-left"></i>
+                                  </a>
+                                </li>
+                              {% endfor %}
                             </ul>
                           </div>
                           
                           <!-- Subcategories Column -->
                           <div class="col-md-9 py-3">
                             <div class="subcategories-container">
-                              <!-- Electronics Subcategories -->
-                              <div class="subcategory-content" id="electronics">
-                                <div class="row">
-                                  <div class="col-md-4">
-                                    <h6 class="fw-bold mb-3">موبایل</h6>
-                                    <ul class="list-unstyled">
-                                      <li><a href="#" class="text-muted small py-1 d-block">گوشی موبایل</a></li>
-                                      <li><a href="#" class="text-muted small py-1 d-block">کیف و کاور گوشی</a></li>
-                                      <li><a href="#" class="text-muted small py-1 d-block">پاوربانک</a></li>
-                                      <li><a href="#" class="text-muted small py-1 d-block">شارژر موبایل</a></li>
-                                    </ul>
-                                  </div>
-                                  <div class="col-md-4">
-                                    <h6 class="fw-bold mb-3">لپ تاپ</h6>
-                                    <ul class="list-unstyled">
-                                      <li><a href="#" class="text-muted small py-1 d-block">لپ تاپ و الترابوک</a></li>
-                                      <li><a href="#" class="text-muted small py-1 d-block">لوازم جانبی لپ تاپ</a></li>
-                                      <li><a href="#" class="text-muted small py-1 d-block">کیف لپ تاپ</a></li>
-                                    </ul>
-                                  </div>
-                                  <div class="col-md-4">
-                                    <h6 class="fw-bold mb-3">کامپیوتر</h6>
-                                    <ul class="list-unstyled">
-                                      <li><a href="#" class="text-muted small py-1 d-block">کامپیوتر همه کاره</a></li>
-                                      <li><a href="#" class="text-muted small py-1 d-block">قطعات داخلی کامپیوتر</a></li>
-                                      <li><a href="#" class="text-muted small py-1 d-block">ماوس</a></li>
-                                      <li><a href="#" class="text-muted small py-1 d-block">کیبورد</a></li>
-                                    </ul>
+                              {% for category in main_categories %}
+                                <div class="subcategory-content" id="cat{{ category.id }}" {% if forloop.first %}style="display:block;"{% else %}style="display:none;"{% endif %}>
+                                  <div class="row">
+                                    {% for sub in category.sub_categories.all %}
+                                      <div class="col-md-4">
+                                        <h6 class="fw-bold mb-3">{{ sub.title }}</h6>
+                                        <ul class="list-unstyled">
+                                          {% for subsub in sub.sub_categories.all %}
+                                            <li>
+                                              <a href="{{ subsub.get_absolute_url }}" class="text-muted small py-1 d-block">{{ subsub.title }}</a>
+                                            </li>
+                                          {% empty %}
+                                            <li>
+                                              <a href="{{ sub.get_absolute_url }}" class="text-muted small py-1 d-block">{{ sub.title }}</a>
+                                            </li>
+                                          {% endfor %}
+                                        </ul>
+                                      </div>
+                                    {% empty %}
+                                      <div class="col-12">
+                                        <span class="text-muted">زیر دسته‌ای وجود ندارد.</span>
+                                      </div>
+                                    {% endfor %}
                                   </div>
                                 </div>
-                              </div>
-                              
-                              <!-- Tools Subcategories -->
-                              <div class="subcategory-content" id="tools">
-                                <div class="row">
-                                  <div class="col-md-4">
-                                    <h6 class="fw-bold mb-3">ابزار برقی</h6>
-                                    <ul class="list-unstyled">
-                                      <li><a href="#" class="text-muted small py-1 d-block">دریل</a></li>
-                                      <li><a href="#" class="text-muted small py-1 d-block">اره برقی</a></li>
-                                      <li><a href="#" class="text-muted small py-1 d-block">پیچ گوشتی برقی</a></li>
-                                    </ul>
-                                  </div>
-                                  <div class="col-md-4">
-                                    <h6 class="fw-bold mb-3">ابزار دستی</h6>
-                                    <ul class="list-unstyled">
-                                      <li><a href="#" class="text-muted small py-1 d-block">آچار</a></li>
-                                      <li><a href="#" class="text-muted small py-1 d-block">پیچ گوشتی</a></li>
-                                      <li><a href="#" class="text-muted small py-1 d-block">انبردست</a></li>
-                                    </ul>
-                                  </div>
-                                </div>
-                              </div>
-                              
-                              <!-- Fashion Subcategories -->
-                              <div class="subcategory-content" id="fashion">
-                                <div class="row">
-                                  <div class="col-md-4">
-                                    <h6 class="fw-bold mb-3">مردانه</h6>
-                                    <ul class="list-unstyled">
-                                      <li><a href="#" class="text-muted small py-1 d-block">لباس مردانه</a></li>
-                                      <li><a href="#" class="text-muted small py-1 d-block">کفش مردانه</a></li>
-                                      <li><a href="#" class="text-muted small py-1 d-block">اکسسوری مردانه</a></li>
-                                    </ul>
-                                  </div>
-                                  <div class="col-md-4">
-                                    <h6 class="fw-bold mb-3">زنانه</h6>
-                                    <ul class="list-unstyled">
-                                      <li><a href="#" class="text-muted small py-1 d-block">لباس زنانه</a></li>
-                                      <li><a href="#" class="text-muted small py-1 d-block">کفش زنانه</a></li>
-                                      <li><a href="#" class="text-muted small py-1 d-block">اکسسوری زنانه</a></li>
-                                    </ul>
-                                  </div>
-                                </div>
-                              </div>
-                              
-                              <!-- Other subcategories would be defined similarly -->
+                              {% endfor %}
                             </div>
                           </div>
                         </div>

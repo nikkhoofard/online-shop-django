@@ -100,7 +100,7 @@ def user_login(request):
 
 def user_logout(request):
     logout(request)
-    return redirect('accounts:user_login')
+    return redirect('shop:home_page')
 
 
 def edit_profile(request):

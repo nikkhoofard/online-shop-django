@@ -1,5 +1,5 @@
 {% extends "dashboard.html" %}
-
+{% load jalali_tag %}
 {% block content %}
 
 <table class="table table-striped ">
@@ -21,7 +21,7 @@
         <td><a class="text-decoration-none" href="{{ product.get_absolute_url }}">{{ product.title }}</a></td>
         <td>${{ product.price }}</td>
         <td>{{ product.category }}</td>
-        <td>{{ product.date_created|date:"M d" }}</td>
+        <td>{{ product.date_created|jalali_date }}</td>
         <td><a class="text-danger text-decoration-none" href="{% url 'dashboard:delete_product' product.id %}">حذف</a></td>
         <td><a class="text-info text-decoration-none" href="{% url 'dashboard:edit_product' product.id %}">ویرایش</a></td>
       </tr>

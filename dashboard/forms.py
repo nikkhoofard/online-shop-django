@@ -9,8 +9,8 @@ class AddProductForm(ModelForm):
         model = Product
         fields = [
             'category', 'image', 'title', 'description', 'price',
-            'compatible_cars', 'brand', 'manufacturer', 'price_valid_until',
-            'has_warranty', 'warranty_months'
+            'discount_price', 'color', 'compatible_cars', 'brand', 'manufacturer',
+            'price_valid_until', 'has_warranty', 'warranty_months', 'is_active'
         ]
         widgets = {
             'price_valid_until': forms.DateInput(attrs={'type': 'date'}),
@@ -19,11 +19,16 @@ class AddProductForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(AddProductForm, self).__init__(*args, **kwargs)
+        self.fields['category'].queryset = Category.objects.filter(
+         sub_categories__isnull=True,
+         sub_category__isnull=False
+        )
         for visible in self.visible_fields():
-            if visible.name != 'has_warranty':  # Don't add form-control to checkbox
+            if visible.name not in ['has_warranty', 'is_active']:
                 visible.field.widget.attrs['class'] = 'form-control'
-            if visible.name == 'has_warranty':
+            if visible.name in ['has_warranty', 'is_active']:
                 visible.field.widget.attrs['class'] = 'form-check-input'
+
 class AddShopForm(ModelForm):
     class Meta:
         model = Shop
@@ -64,7 +69,7 @@ class EditProductForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super(EditProductForm, self).__init__(*args, **kwargs)
         for visible in self.visible_fields():
-            if visible.name != 'has_warranty':  # Don't add form-control to checkbox
+            if visible.name not in ['has_warranty', 'is_active']:
                 visible.field.widget.attrs['class'] = 'form-control'
-            if visible.name == 'has_warranty':
+            if visible.name in ['has_warranty', 'is_active']:
                 visible.field.widget.attrs['class'] = 'form-check-input'

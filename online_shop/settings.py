@@ -34,7 +34,7 @@ INSTALLED_APPS = [
     'dashboard.apps.DashboardConfig',
     'phonenumber_field',
     'django.contrib.humanize',
-    
+    'django_jalali',
 ]
 
 MIDDLEWARE = [
@@ -62,6 +62,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'online_shop.context_processors.return_cart',
                 'online_shop.context_processors.return_categories',
+                'shop.views.categories_processor',
             ],
         },
     },

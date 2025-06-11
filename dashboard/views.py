@@ -64,22 +64,27 @@ def add_shop(request):
 @user_passes_test(is_manager)
 @login_required
 def add_product(request):
+    print('add_product')
     try:
         # Get the shop owned by the current user
         shop = Shop.objects.get(owner=request.user)
-        
+        print('shop', shop)
         if request.method == 'POST':
             form = AddProductForm(request.POST, request.FILES)
+            
             if form.is_valid():
                 product = form.save(commit=False)
                 product.shop = shop  # Set the shop to the user's shop
                 product.save()
                 # Save the many-to-many relationships
+                print('product saved')
                 form.save_m2m()
                 messages.success(request, 'Product added Successfully!')
                 return redirect('dashboard:add_product')
         else:
+            print('form not valid')
             form = AddProductForm()
+        print('form', form)
         context = {'title':'Add Product', 'form':form}
         return render(request, 'add_product.html', context)
     except Shop.DoesNotExist:

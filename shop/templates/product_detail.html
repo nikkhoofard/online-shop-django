@@ -1,14 +1,17 @@
 {% extends 'base.html' %}
+{% load category_tags %}
 {% load humanize %}
 {% block content %}
     <!-- Breadcrumb -->
     <div class="container mt-3">
       <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="index.html" class="text-decoration-none">فروشگاه</a></li>
-          <li class="breadcrumb-item"><a href="#" class="text-decoration-none">قطعات خودرو</a></li>
-          <li class="breadcrumb-item"><a href="#" class="text-decoration-none">قطعات بدنه</a></li>
-          <li class="breadcrumb-item active" aria-current="page">صفحه کیلومتر شمار</li>
+          <li class="breadcrumb-item"><a href="{% url 'shop:home_page' %}" class="text-decoration-none">فروشگاه</a></li>
+          {% get_category_ancestors product.category as ancestors %}
+          {% for cat in ancestors %}
+            <li class="breadcrumb-item"><a href="{{ cat.get_absolute_url }}" class="text-decoration-none">{{ cat.title }}</a></li>
+          {% endfor %}
+          <li class="breadcrumb-item active" aria-current="page">{{ product.title }}</li>
         </ol>
       </nav>
     </div>

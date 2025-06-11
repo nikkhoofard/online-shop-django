@@ -27,9 +27,10 @@
                                 {{ form.price }}
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">{{ form.price_valid_until.label }}</label>
-                                {{ form.price_valid_until }}
-                                <small class="text-muted">تا زمانی که این قیمت معتبر است؟</small>
+                                <label class="form-label">تاریخ اعتبار قیمت (جلالی)</label>
+                                <input type="text" id="jalali_date" class="form-control" autocomplete="off">
+                                <input type="hidden" name="price_valid_until" id="gregorian_date" value="{{ form.price_valid_until.value|default_if_none:'' }}">
+                                <small class="text-muted">تاریخ را به صورت شمسی انتخاب کنید.</small>  
                             </div>
                             <div class="col-md-12 mb-3">
                                 <label class="form-label">{{ form.description.label }}</label>
@@ -90,4 +91,36 @@
         </div>
     </div>
 </div>
+
+<script>
+    $(document).ready(function() {
+
+        $("#jalali_date").persianDatepicker({
+            format: 'YYYY/MM/DD',
+            autoClose: true,
+            onSelect: function(unix) {
+                // تبدیل به میلادی
+                var pd = new persianDate(unix).toGregorian();
+                var gDate = pd.year + '-' + 
+                            ('0' + pd.month).slice(-2) + '-' + 
+                            ('0' + pd.day).slice(-2);
+                $("#gregorian_date").val(gDate);
+            }
+        });
+
+        // اگر فرم ویرایش است و مقدار میلادی داری، مقدار جلالی را هم ست کن
+        {% if form.price_valid_until.value %}
+            var gDate = "{{ form.price_valid_until.value|date:'Y-m-d' }}";
+            var pDate = new persianDate(new Date(gDate)).format('YYYY/MM/DD');
+            $("#jalali_date").val(pDate);
+            $("#gregorian_date").val(gDate);
+        {% endif %}
+    });
+
+
+
+
+
+</script>
+
 {% endblock %}

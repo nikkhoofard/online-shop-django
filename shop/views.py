@@ -110,3 +110,8 @@ def filter_by_category(request, slug):
 				for product in Product.objects.filter(category=category).all()]
 	context = {'products': paginat(request ,result)}
 	return render(request, 'home_page.html', context)
+
+
+def categories_processor(request):
+	main_categories = Category.objects.filter(is_sub=False).all()
+	return {'main_categories': main_categories}
