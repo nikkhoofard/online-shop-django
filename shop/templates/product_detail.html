@@ -201,20 +201,10 @@
               </div>
               
               <!-- Quantity -->
-              <div class="mb-4">
-                <div class="d-flex align-items-center">
-                  <span class="me-2">تعداد:</span>
-                  <div class="input-group input-group-sm" style="width: 120px;">
-                    <button class="btn btn-outline-secondary" type="button" id="decreaseQuantity">-</button>
-                    <input type="text" class="form-control text-center" value="1" id="quantityInput">
-                    <button class="btn btn-outline-secondary" type="button" id="increaseQuantity">+</button>
-                  </div>
-                </div>
-              </div>
               
               <!-- Add to Cart Button -->
               <div class="d-grid gap-2 mb-3">
-                <button class="btn btn-danger py-2">
+                <button class="btn btn-danger py-2" id="addToCartBtn" data-product-id="{{ product.id }}">
                   <i class="fas fa-shopping-cart me-2"></i>
                   افزودن به سبد خرید
                 </button>
@@ -927,16 +917,24 @@
         });
         
         // افزودن به سبد خرید
-        $('#addToCartBtn').on('click', function() {
-          const productId = $(this).data('product-id');
-          const quantity = $('#quantityInput').val();
-          
-          // اینجا می‌توانید کد مربوط به افزودن محصول به سبد خرید را قرار دهید
-          // مثال: ارسال درخواست AJAX به سرور
-          
-          // نمایش پیام موفقیت
-          const toast = new bootstrap.Toast($('#addToCartToast'));
-          toast.show();
+        $('#addToCartBtn').on('click', function(e) {
+          e.preventDefault();
+          var productId = $(this).data('product-id');
+          var quantity = $('#quantityInput').val() || 1;
+          $.ajax({
+            url: "{% url 'cart:add_to_cart' product_id=0 %}".replace('0', productId),
+            method: "POST",
+            data: {
+              'quantity': quantity,
+              'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function() {
+              // نمایش پیام موفقیت و آپدیت تعداد سبد خرید
+              // (در صورت نیاز، تعداد را از یک endpoint جداگانه بگیر)
+              alert('محصول با موفقیت به سبد خرید اضافه شد!');
+              // می‌توانی تعداد سبد خرید را در هدر آپدیت کنی
+            }
+          });
         });
         
         // افزودن به علاقه‌مندی‌ها

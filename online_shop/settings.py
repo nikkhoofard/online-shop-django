@@ -63,6 +63,7 @@ TEMPLATES = [
                 'online_shop.context_processors.return_cart',
                 'online_shop.context_processors.return_categories',
                 'shop.views.categories_processor',
+                'cart.views.cart_count_processor',
             ],
         },
     },

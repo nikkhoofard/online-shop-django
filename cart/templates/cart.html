@@ -26,6 +26,12 @@
         <td><a class="text-danger text-decoration-none" href="{% url 'cart:remove_from_cart' item.product.id %}">remove</a></td>
       </tr>
     </tbody>
+    {% empty %}
+    <tbody>
+      <tr>
+        <td colspan="6">سبد خرید شما خالی است.</td>
+      </tr>
+    </tbody>
     {% endfor %}
 </table>
 <hr>
