@@ -29,7 +29,7 @@ def home_page(request):
 	context = {'products': paginat(request ,products)}
 	return render(request, 'home_page.html', context)
 
-@login_required
+
 def product_detail(request, slug):
 	product = get_object_or_404(Product, slug=slug)
 	shop = product.shop
@@ -37,12 +37,12 @@ def product_detail(request, slug):
 	context = {
 		'title':product.title,
 		'product':product,
-		'favorites':'favorites',
+	#	'favorites':'favorites',
 		'related_products':related_products,
 		'shop':shop	
 	}
-	if request.user.likes.filter(id=product.id).first():
-		context['favorites'] = 'remove'
+	#if request.user.likes.filter(id=product.id).first():
+	#	context['favorites'] = 'remove'
 	return render(request, 'product_detail.html', context)
 
 
