@@ -62,8 +62,8 @@
                     </ul>
                   </div>
                   <div class="position-relative">
-                    <a href="{% url 'cart:show_cart' %}" class="text-decoration-none text-dark">
-                      <i class="bi bi-cart fs-4"></i>
+                    <a href="{% url 'cart:show_cart' %}" class="text-dark">
+                      <i class="bi bi-cart fs-5"></i>
                       <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                         {{ cart_count|default:0 }}
                       </span>
@@ -71,18 +71,23 @@
                   </div>
                 </div>
                 {%else %}
-                <a href="{% url 'accounts:signup' %}">
-                <i class="bi bi-person fs-5"></i>
-                <span class="ms-2">ورود | ثبت‌نام</span>
-              </a>
-              </div>
-              <div class="position-relative">
-                <a href="#" class="text-dark">
-                  <i class="bi bi-cart fs-5"></i>
-                  <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">2</span>
+                <a href="{% url 'accounts:signup' %}" class="text-decoration-none text-dark"> <!-- اضافه کردن کلاس text-dark -->
+                    <i class="bi bi-person fs-5 text-dark"></i> <!-- اضافه کردن کلاس text-dark -->
+                    <span class="ms-2">ورود | ثبت‌نام</span>
                 </a>
-              </div>
-              {%endif%}
+                </div>
+                <!-- حذف ایکون سبد خرید برای کاربران غیر لاگین -->
+                {% if request.user.is_authenticated %}
+                <div class="position-relative">
+                    <a href="{% url 'cart:show_cart' %}" class="text-dark">
+                        <i class="bi bi-cart fs-5"></i>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                            {{ cart_count|default:0 }}
+                        </span>
+                    </a>
+                </div>
+                {% endif %}
+                {%endif%}
             </div>
           </div>
         </div>
