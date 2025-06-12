@@ -64,7 +64,7 @@
                   <div class="position-relative">
                     <a href="{% url 'cart:show_cart' %}" class="text-dark">
                       <i class="bi bi-cart fs-5"></i>
-                      <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                      <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger cart-count">
                         {{ cart_count|default:0 }}
                       </span>
                     </a>
@@ -81,7 +81,7 @@
                 <div class="position-relative">
                     <a href="{% url 'cart:show_cart' %}" class="text-dark">
                         <i class="bi bi-cart fs-5"></i>
-                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger cart-count">
                             {{ cart_count|default:0 }}
                         </span>
                     </a>
@@ -205,6 +205,9 @@
           <a href="{% url 'cart:show_cart' %}" class="nav-link d-flex flex-column align-items-center">
             <i class="bi bi-cart"></i>
             <span class="small">سبد خرید</span>
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger cart-count">
+              {{ cart_count|default:0 }}
+            </span>
           </a>
         </li>
         <li class="nav-item">
@@ -373,7 +376,27 @@
         const value = $(this).val();
         $('#priceRange, #mPriceRange').val(value);
       });
- 
+      $('#addToCartBtn').on('click', function(e) {
+        e.preventDefault();
+        var productId = $(this).data('product-id');
+        var quantity = $('#quantityInput').val() || 1;
+        $.ajax({
+          url: "{% url 'cart:add_to_cart' product_id=0 %}".replace('0', productId),
+          method: "POST",
+          data: {
+            'quantity': quantity,
+            'csrfmiddlewaretoken': '{{ csrf_token }}'
+          },
+          success: function(response) {
+            $('.cart-count').text(response.cart_count);
+            // نمایش پیام موفقیت یا toast
+            alert('محصول با موفقیت به سبد خرید اضافه شد!');
+          },
+          error: function() {
+            alert('خطا در افزودن به سبد خرید');
+          }
+        });
+      });
     </script>
   </body>
 </html>
