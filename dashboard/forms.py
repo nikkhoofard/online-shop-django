@@ -1,7 +1,7 @@
 from django import forms
 from django.forms import ModelForm
 
-from shop.models import Product, Category, Shop
+from shop.models import Product, Category, Shop, ProductImage
 
 
 class AddProductForm(ModelForm):
@@ -10,7 +10,8 @@ class AddProductForm(ModelForm):
         fields = [
             'category', 'image', 'title', 'description', 'price',
             'discount_price', 'color', 'compatible_cars', 'brand', 'manufacturer',
-            'price_valid_until', 'has_warranty', 'warranty_months', 'is_active'
+            'price_valid_until', 'has_warranty', 'warranty_months', 'is_active',
+            'main_image'
         ]
         widgets = {
             'price_valid_until': forms.DateInput(attrs={'type': 'date'}),
@@ -59,7 +60,7 @@ class EditProductForm(ModelForm):
         fields = [
             'category', 'image', 'title', 'description', 'price',
             'compatible_cars', 'brand', 'manufacturer', 'price_valid_until',
-            'has_warranty', 'warranty_months'
+            'has_warranty', 'warranty_months', 'main_image'
         ]
         widgets = {
             'price_valid_until': forms.DateInput(attrs={'type': 'date'}),
@@ -73,3 +74,10 @@ class EditProductForm(ModelForm):
                 visible.field.widget.attrs['class'] = 'form-control'
             if visible.name in ['has_warranty', 'is_active']:
                 visible.field.widget.attrs['class'] = 'form-check-input'
+
+
+
+class ProductImageForm(ModelForm):
+    class Meta:
+        model = ProductImage
+        fields = ['image','alt_text']

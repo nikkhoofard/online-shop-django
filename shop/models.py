@@ -94,6 +94,7 @@ class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='category')
     shop = models.ForeignKey(Shop, on_delete=models.CASCADE, related_name='shop')
     image = models.ImageField(upload_to='products')
+    main_image = models.ImageField(upload_to='products', null=True, blank=True)
     title = models.CharField(max_length=250)
     description = models.TextField()
     price = models.IntegerField()
@@ -137,3 +138,13 @@ class Product(models.Model):
             # Use a default slug with the ID
             self.slug = f"product-{self.id or 'new'}"
         return super().save(*args, **kwargs)
+    
+
+
+class ProductImage(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(upload_to='products')
+    alt_text = models.CharField(max_length=200, blank=True)
+
+    def __str__(self):
+        return f"{self.product.title} - {self.id}"

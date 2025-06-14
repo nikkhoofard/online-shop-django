@@ -145,3 +145,4 @@ def get_all_subcategory_ids(category):
     for sub in category.sub_categories.all():
         ids.extend(get_all_subcategory_ids(sub))
     return ids
+
