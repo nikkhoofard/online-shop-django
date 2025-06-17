@@ -108,7 +108,7 @@ def search(request):
 		'query': query,
 		'message': message,
 	}
-	return render(request, 'home_page.html', context)
+	return render(request, 'search.html', context)
 
 
 
@@ -135,7 +135,7 @@ def search_suggestions(request):
     results = []
     if query:
         products = Product.objects.filter(title__icontains=query)[:10]
-        results = list(products.values('id', 'title'))
+        results = list(products.values('slug', 'title'))
     return JsonResponse({'results': results})
 
 

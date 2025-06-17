@@ -192,8 +192,8 @@
 
 <!--nav mobile-->
 <footer>
-  <nav class="navbar bottom-nav d-block d-md-none">
-    <div class="container">
+  <nav class="navbar bottom-nav  d-block d-md-none fixed-bottom bg-white border-top py-2" >
+    <div class="container-fluid px-0 mx-0">
       <ul class="navbar-nav w-100 d-flex flex-row justify-content-around">
         <li class="nav-item">
           <a href="{% url 'shop:home_page' %}" class="nav-link active d-flex flex-column align-items-center">
@@ -303,7 +303,7 @@
               if (data.results.length > 0) {
                 data.results.forEach(function(item) {
                   $suggestions.append(
-                    '<a href="/product/' + item.id + '/" class="list-group-item list-group-item-action">' + item.title + '</a>'
+                    '<a href="/product/' + item.slug + '/" class="list-group-item list-group-item-action">' + item.title + '</a>'
                   );
                 });
                 $suggestions.show();
