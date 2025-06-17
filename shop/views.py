@@ -117,11 +117,11 @@ def filter_by_category(request, slug):
     category = Category.objects.filter(slug=slug).first()
     if not category:
         context = {'products': []}
-        return render(request, 'home_page.html', context)
+        return render(request, 'search.html', context)
     category_ids = get_all_subcategory_ids(category)
     products = Product.objects.filter(category_id__in=category_ids)
     context = {'products': paginat(request, products)}
-    return render(request, 'home_page.html', context)
+    return render(request, 'search.html', context)
 
 
 
