@@ -111,6 +111,7 @@ class Product(models.Model):
     price_valid_until = models.DateField(null=True, blank=True)
     has_warranty = models.BooleanField(default=False)
     warranty_months = models.PositiveIntegerField(default=0, help_text="Number of months of warranty")
+    stock = models.PositiveBigIntegerField(default=0)
     
     class Meta:
         ordering = ('-date_created',)

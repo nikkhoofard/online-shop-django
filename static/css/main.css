@@ -326,6 +326,49 @@ body {
 
 /*   filter style */
 
+/* =====================
+   فیلتر موبایل و نوبار پایین (سازگار با بوت‌استرپ)
+   ===================== */
+
+/* دکمه فیلتر موبایل فقط در موبایل */
+.filter-mobile-btn {
+  display: none;
+}
+
+@media (max-width: 767.98px) {
+  .filter-mobile-btn {
+    z-index: 1040; /* کمتر از .offcanvas-bottom که 1060 است */
+  }
+  .offcanvas-bottom {
+    z-index: 1060 !important;
+  }
+  .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1030;
+    width: 100%;
+    background-color: white;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+  }
+  .main-content {
+    margin-bottom: 120px; /* فضای کافی برای دکمه و نوبار پایین */
+  }
+}
+
+@media (min-width: 768px) {
+  .filter-mobile-btn,
+  .offcanvas-bottom,
+  .bottom-nav {
+    display: none !important;
+  }
+  .main-content {
+    margin-bottom: 0 !important;
+  }
+}
+
+/* استایل‌های عمومی فیلتر و فرم */
 .filter-section h6 {
   font-size: 1rem;
   color: #333;
@@ -350,30 +393,6 @@ body {
 
 .form-range::-ms-thumb {
   background: var(--pink);
-}
-
-/* تنظیم فاصله بین منوی فیلتر موبایل و فوتر */
-@media (max-width: 767.98px) {
-  .main-content {
-    margin-bottom: 60px;
-  }
-  
-  .bottom-nav {
-    /* Removed margin-bottom that was causing positioning issues */
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-    z-index: 1030;
-    padding: 10px 0;
-    background-color: white;
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
-  }
-}
-
-/* استایل offcanvas برای فیلترها */
-.offcanvas-bottom {
-  border-top-left-radius: 1rem;
-  border-top-right-radius: 1rem;
 }
 
 .offcanvas-header {

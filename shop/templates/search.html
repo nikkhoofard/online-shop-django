@@ -1,184 +1,243 @@
+{# search.html #}
 {% extends 'base.html' %}
-
 {% block content %}
-    <section class="main-content">
-      <div class="container">
-        <div class="row align-items-center justify-content-center">
-        </div>
-        <div class="row">
-          <!-- Sidebar Filters (Desktop) -->
-          <div class="col-lg-3 d-none d-lg-block">
-            <div class="card shadow-sm mb-4">
-              <div class="card-header bg-white">
-                <h5 class="mb-0">فیلترها</h5>
-              </div>
-              <div class="card-body">
-                <!-- دسته‌بندی -->
-                <div class="filter-section mb-4">
-                  <h6 class="fw-bold mb-3">دسته‌بندی</h6>
-                  <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" id="category1">
-                    <label class="form-check-label" for="category1">کالای دیجیتال</label>
-                  </div>
-                  <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" id="category2">
-                    <label class="form-check-label" for="category2">لوازم خانگی</label>
-                  </div>
-                  <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" id="category3">
-                    <label class="form-check-label" for="category3">مد و پوشاک</label>
-                  </div>
+<section class="main-content">
+  <div class="container">
+    <div class="row">
+      <!-- Sidebar Filters (فقط دسکتاپ) -->
+      <div class="col-lg-3 d-none d-lg-block">
+        <form id="filter-form">
+          <div class="card mb-4">
+            <div class="card-header">مدل ماشین</div>
+            <div class="card-body">
+              {% for car_model in car_models %}
+                <div class="form-check mb-2">
+                  <input name="car_model" value="{{ car_model.id }}"
+                         class="form-check-input" type="checkbox"
+                         id="car-model-{{ forloop.counter }}"
+                         {% if car_model.id|stringformat:"s" in selected_car_models %}checked{% endif %}>
+                  <label class="form-check-label" for="car-model-{{ forloop.counter }}">
+                    {{ car_model.brand.name }} {{ car_model.name }}
+                  </label>
                 </div>
+              {% endfor %}
+            </div>
+          </div>
+          <!-- برند -->
+<div class="card mb-4">
+  <div class="card-header">برند</div>
+  <div class="card-body">
+    {% for brand in brands %}
+      <div class="form-check mb-2">
+        <input name="brand" value="{{ brand }}"
+               class="form-check-input" type="checkbox"
+               id="brand-{{ forloop.counter }}"
+               {% if brand in selected_brands %}checked{% endif %}>
+        <label class="form-check-label" for="brand-{{ forloop.counter }}">
+          {{ brand }}
+        </label>
+      </div>
+    {% empty %}
+      <p>برندی یافت نشد.</p>
+    {% endfor %}
+  </div>
+</div>
+          <!-- محدوده قیمت -->
+          <div class="card mb-4">
+            <div class="card-header">قیمت</div>
+            <div class="card-body">
+              <input name="price_min" type="number" class="form-control mb-2"
+                     placeholder="حداقل" value="{{ price_min }}">
+              <input name="price_max" type="number" class="form-control"
+                     placeholder="حداکثر" value="{{ price_max }}">
+            </div>
+          </div>
 
-                <!-- برند -->
-                <div class="filter-section mb-4">
-                  <h6 class="fw-bold mb-3">برند</h6>
-                  <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" id="brand1">
-                    <label class="form-check-label" for="brand1">سامسونگ</label>
-                  </div>
-                  <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" id="brand2">
-                    <label class="form-check-label" for="brand2">اپل</label>
-                  </div>
-                  <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" id="brand3">
-                    <label class="form-check-label" for="brand3">شیائومی</label>
-                  </div>
-                </div>
-
-                <!-- محدوده قیمت -->
-                <div class="filter-section mb-4">
-                  <h6 class="fw-bold mb-3">محدوده قیمت</h6>
-                  <div class="price-range">
-                    <input type="range" class="form-range" min="0" max="100" id="priceRange">
-                    <div class="d-flex justify-content-between">
-                      <span>۰ تومان</span>
-                      <span>۱۰,۰۰۰,۰۰۰ تومان</span>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- وضعیت موجودی -->
-                <div class="filter-section">
-                  <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="inStock">
-                    <label class="form-check-label" for="inStock">فقط کالاهای موجود</label>
-                  </div>
-                </div>
+          <!-- موجودی -->
+          <div class="card mb-4">
+            <div class="card-body">
+              <div class="form-check">
+                <input name="in_stock"
+                      class="form-check-input"
+                      type="checkbox"
+                      id="inStock"
+                     {% if in_stock == 'on' %}checked{% endif %}>
+                <label class="form-check-label" for="inStock">
+                  فقط کالاهای موجود
+                </label>
               </div>
             </div>
           </div>
-        <div class="col-12 col-lg-9">
-          <div class="row">
-              {% for product in products.object_list %}
-            <div class="col-md-4 mb-4">
-              <div class="card h-100 shadow-sm">
-                <img style="object-fit: cover;" class="card-img-top" height="200" src="{{product.image.url}}" alt="{{product.title}}">
-                <div class="card-body">
-                  <h5 class="card-title">{{product.title}}</h5>
 
-                  <div class="d-flex justify-content-between align-items-center mt-3">
-                    <h6 class="m-0 text-success">{{product.price}} تومن</h6>
-                    <a href="{{product.get_absolute_url }}" class="btn btn-sm btn-outline-primary">مشاهده جزئیات</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            {%endfor%}
-            {# Add the missing endif tag here #}
+          <button id="apply-filters" type="button" class="btn btn-primary w-100">
+            اعمال فیلترها
+          </button>
+        </form>
+      </div>
 
-
-          </div>
-        </div>
-    </div>
-    </section>
-
-
-
-    <section>
-      <div class="filter-menu-mobile d-block d-lg-none">
-        <div class="filter-button-container fixed-bottom bg-white shadow-lg py-2 border-top">
-          <div class="container">
-            <button class="btn btn-outline-primary w-100" type="button" data-bs-toggle="offcanvas" data-bs-target="#filterOffcanvas">
-              <i class="fa fa-filter me-2"></i>فیلترها
-            </button>
-          </div>
-        </div>
-
-        <!-- Offcanvas Filter Menu -->
-        <div class="offcanvas offcanvas-bottom h-75" tabindex="-1" id="filterOffcanvas" aria-labelledby="filterOffcanvasLabel">
-          <div class="offcanvas-header border-bottom">
-            <h5 class="offcanvas-title" id="filterOffcanvasLabel">فیلترها</h5>
-            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-          </div>
-          <div class="offcanvas-body">
-            <div class="container">
-              <!-- دسته‌بندی -->
-              <div class="filter-section mb-4">
-                <h6 class="fw-bold mb-3">دسته‌بندی</h6>
-                <div class="form-check mb-2">
-                  <input class="form-check-input" type="checkbox" id="mCategory1">
-                  <label class="form-check-label" for="mCategory1">کالای دیجیتال</label>
-                </div>
-                <div class="form-check mb-2">
-                  <input class="form-check-input" type="checkbox" id="mCategory2">
-                  <label class="form-check-label" for="mCategory2">لوازم خانگی</label>
-                </div>
-                <div class="form-check mb-2">
-                  <input class="form-check-input" type="checkbox" id="mCategory3">
-                  <label class="form-check-label" for="mCategory3">مد و پوشاک</label>
-                </div>
-              </div>
-
-              <!-- برند -->
-              <div class="filter-section mb-4">
-                <h6 class="fw-bold mb-3">برند</h6>
-                <div class="form-check mb-2">
-                  <input class="form-check-input" type="checkbox" id="mBrand1">
-                  <label class="form-check-label" for="mBrand1">سامسونگ</label>
-                </div>
-                <div class="form-check mb-2">
-                  <input class="form-check-input" type="checkbox" id="mBrand2">
-                  <label class="form-check-label" for="mBrand2">اپل</label>
-                </div>
-                <div class="form-check mb-2">
-                  <input class="form-check-input" type="checkbox" id="mBrand3">
-                  <label class="form-check-label" for="mBrand3">شیائومی</label>
-                </div>
-              </div>
-
-              <!-- محدوده قیمت -->
-              <div class="filter-section mb-4">
-                <h6 class="fw-bold mb-3">محدوده قیمت</h6>
-                <div class="price-range">
-                  <input type="range" class="form-range" min="0" max="100" id="mPriceRange">
-                  <div class="d-flex justify-content-between">
-                    <span>۰ تومان</span>
-                    <span>۱۰,۰۰۰,۰۰۰ تومان</span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- وضعیت موجودی -->
-              <div class="filter-section mb-4">
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" id="mInStock">
-                  <label class="form-check-label" for="mInStock">فقط کالاهای موجود</label>
-                </div>
-              </div>
-
-              <!-- دکمه‌های اعمال فیلتر -->
-              <div class="d-flex justify-content-between mt-4">
-                <button class="btn btn-outline-secondary" type="button" data-bs-dismiss="offcanvas">انصراف</button>
-                <button class="btn btn-primary" type="button">اعمال فیلترها</button>
-              </div>
-            </div>
-          </div>
+      <!-- نتایج -->
+      <div class="col-lg-9">
+        <div id="products-container">
+          {% include 'partials/_products_list.html' %}
         </div>
       </div>
-    </section>
+    </div>
+  </div>
+</section>
 
+<!-- دکمه فیلتر موبایل (فقط موبایل) -->
+<div class="d-block d-md-none filter-mobile-btn" style="position: fixed; bottom: 75px; left: 0; right: 0;">
+  <button class="btn btn-outline-primary w-100" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileFilters" aria-controls="mobileFilters">
+    فیلترها <i class="bi bi-funnel"></i>
+  </button>
+</div>
 
+<!-- Offcanvas فیلتر موبایل (فقط موبایل) -->
+<div class="offcanvas offcanvas-bottom" tabindex="-1" id="mobileFilters" aria-labelledby="mobileFiltersLabel" style="height: 70vh;">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title" id="mobileFiltersLabel">فیلترها</h5>
+    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="بستن"></button>
+  </div>
+  <div class="offcanvas-body">
+    <form id="mobile-filter-form">
+      <!-- اینجا همان فیلترهای فرم دسکتاپ را قرار دهید (دسته‌بندی، برند، قیمت، ...)، فقط nameها باید با فرم اصلی یکی باشد -->
+      <!-- مثال: -->
+      <!-- مدل ماشین -->
+      <div class="mb-3">
+        <label class="form-label">مدل ماشین</label>
+        {% for car_model in car_models %}
+          <div class="form-check">
+            <input name="car_model" value="{{ car_model.id }}"
+                   class="form-check-input" type="checkbox"
+                   id="m-car-model-{{ forloop.counter }}"
+                   {% if car_model.id|stringformat:"s" in selected_car_models %}checked{% endif %}>
+            <label class="form-check-label" for="m-car-model-{{ forloop.counter }}">
+              {{ car_model.brand.name }} {{ car_model.name }}
+            </label>
+          </div>
+        {% endfor %}
+      </div>
+      <!-- برند -->
+      <div class="mb-3">
+        <label class="form-label">برند</label>
+        {% for brand in brands %}
+          <div class="form-check">
+            <input name="brand" value="{{ brand }}"
+                   class="form-check-input" type="checkbox"
+                   id="m-brand-{{ forloop.counter }}"
+                   {% if brand in selected_brands %}checked{% endif %}>
+            <label class="form-check-label" for="m-brand-{{ forloop.counter }}">
+              {{ brand }}
+            </label>
+          </div>
+        {% endfor %}
+      </div>
+      <!-- قیمت -->
+      <div class="mb-3">
+        <label class="form-label">قیمت</label>
+        <input name="price_min" type="number" class="form-control mb-2"
+               placeholder="حداقل" value="{{ price_min }}">
+        <input name="price_max" type="number" class="form-control"
+               placeholder="حداکثر" value="{{ price_max }}">
+      </div>
+      <!-- موجودی -->
+      <div class="mb-3">
+        <div class="form-check">
+          <input name="in_stock"
+                class="form-check-input"
+                type="checkbox"
+                id="mInStock"
+                {% if in_stock == 'on' %}checked{% endif %}>
+          <label class="form-check-label" for="mInStock">
+            فقط کالاهای موجود
+          </label>
+        </div>
+      </div>
+      <button id="apply-mobile-filters" type="button" class="btn btn-primary w-100">
+        اعمال فیلترها
+      </button>
+    </form>
+  </div>
+</div>
 
+<script>
+$(function(){
+  function fetchResults(params) {
+    $.ajax({
+      url: "{% url 'shop:search' %}",
+      data: params,
+      dataType: 'json',
+      success: function(data) {
+        $('#products-container').html(data.html);
+        // scroll to top of results
+        $('html, body').animate({
+          scrollTop: $('#products-container').offset().top - 80
+        }, 300);
+      }
+    });
+  }
+
+  // اعمال فیلتر
+  $('#apply-filters').on('click', function(){
+    const params = $('#filter-form').serializeArray()
+      .reduce((o, x) => {
+        if (o[x.name] !== undefined) {
+          // اگر چند مقدار با یک name باشد
+          if (!Array.isArray(o[x.name])) o[x.name] = [o[x.name]];
+          o[x.name].push(x.value);
+        } else {
+          o[x.name] = x.value;
+        }
+        return o;
+      }, {});
+    fetchResults(params);
+  });
+
+  // شماره صفحه
+  $('#products-container').on('click', '.page-link', function(e){
+    e.preventDefault();
+    const page = $(this).data('page');
+    if(!page) return;
+    let params = $('#filter-form').serializeArray();
+    params.push({name:'page', value: page});
+    fetchResults(
+      params.reduce((o, x) => {
+        if (o[x.name] !== undefined) {
+          if (!Array.isArray(o[x.name])) o[x.name] = [o[x.name]];
+          o[x.name].push(x.value);
+        } else {
+          o[x.name] = x.value;
+        }
+        return o;
+      }, {})
+    );
+  });
+
+  // فیلتر موبایل
+  $('#apply-mobile-filters').on('click', function(){
+    const params = $('#mobile-filter-form').serializeArray()
+      .reduce((o, x) => {
+        if (o[x.name] !== undefined) {
+          if (!Array.isArray(o[x.name])) o[x.name] = [o[x.name]];
+          o[x.name].push(x.value);
+        } else {
+          o[x.name] = x.value;
+        }
+        return o;
+      }, {});
+    fetchResults(params);
+    // بستن offcanvas بعد از اعمال فیلتر
+    var offcanvas = bootstrap.Offcanvas.getInstance(document.getElementById('mobileFilters'));
+    offcanvas.hide();
+  });
+
+  // مدیریت Offcanvas با jQuery
+  $('#mobileFilters').on('show.bs.offcanvas', function () {
+    $('.filter-mobile-btn').hide();
+  });
+  $('#mobileFilters').on('hidden.bs.offcanvas', function () {
+    $('.filter-mobile-btn').show();
+  });
+});
+</script>
 {% endblock %}

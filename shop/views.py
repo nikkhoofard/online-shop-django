@@ -7,6 +7,7 @@ from django.http import JsonResponse
 
 from shop.models import Product, Category
 from cart.forms import QuantityForm
+from shop.models import CarModel
 
 
 def categories_processor(request):
@@ -88,27 +89,69 @@ def favorites(request):
 	return render(request, 'favorites.html', context)
 
 
+
 def search(request):
-	query = request.GET.get('q', '').strip()
-	products = Product.objects.none()
-	message = ''
-	if query:
-		products = Product.objects.filter(
-			Q(title__icontains=query) |
-			Q(description__icontains=query) |
-			Q(brand__icontains=query) |
-			Q(manufacturer__icontains=query)
-		).distinct()
-		if not products.exists():
-			message = "محصولی با این مشخصات پیدا نشد."
-	else:
-		message = "لطفاً عبارت مورد نظر خود را وارد کنید."
-	context = {
-		'products': paginat(request, products),
-		'query': query,
-		'message': message,
-	}
-	return render(request, 'search.html', context)
+    # پارامترها مثل قبل…
+    query = request.GET.get('q', '').strip()
+    category_slugs = request.GET.getlist('category')
+    brands        = request.GET.getlist('brand')
+    price_min     = request.GET.get('price_min')
+    price_max     = request.GET.get('price_max')
+    in_stock      = request.GET.get('in_stock')
+    car_model_ids = request.GET.getlist('car_model')
+    
+
+    qs = Product.objects.all()
+    # اعمال فیلترها...
+    if query:
+        qs = qs.filter(
+            Q(title__icontains=query) |
+            Q(description__icontains=query) |
+            Q(brand__icontains=query)
+        )
+    if category_slugs:
+        qs = qs.filter(category__slug__in=category_slugs)
+    if brands:
+        qs = qs.filter(brand__in=brands)
+    if price_min:
+        qs = qs.filter(price__gte=price_min)
+    if price_max:
+        qs = qs.filter(price__lte=price_max)
+    if in_stock == 'on':
+        qs = qs.filter(stock__gt=0)
+    if car_model_ids:
+        qs = qs.filter(compatible_cars__id__in=car_model_ids)
+    qs = qs.distinct()
+
+    # برندها را یکتا و مرتب کنید
+    brands_list = sorted(set([b.strip() for b in qs.values_list('brand', flat=True) if b]))
+
+    # صفحه‌بندی
+    paginator = Paginator(qs, 12)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        'products': page_obj,
+        'categories': Category.objects.filter(is_sub=False),
+        'brands': brands_list,
+        'selected_categories': category_slugs,
+        'selected_brands': brands,
+        'price_min': price_min,
+        'price_max': price_max,
+        'in_stock': in_stock,
+        'car_models': CarModel.objects.all(),
+        'selected_car_models': car_model_ids,
+    }
+
+    # تشخیص AJAX
+    is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
+    if is_ajax:
+        html = render(request, 'partials/_products_list.html', context).content.decode('utf-8')
+        return JsonResponse({'html': html})
+
+    return render(request, 'search.html', context)
+
 
 
 
