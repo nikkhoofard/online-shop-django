@@ -34,6 +34,7 @@ def create_manager():
         user.save()
 
 
+@csrf_protect
 def manager_login(request):
     if request.method == 'POST':
         form = ManagerLoginForm(request.POST)
@@ -57,6 +58,7 @@ def manager_login(request):
     return render(request, 'manager_login.html', context)
 
 
+@csrf_protect
 def user_register(request):
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST)
@@ -72,6 +74,7 @@ def user_register(request):
     return render(request, 'register.html', context)
 
 
+@csrf_protect
 def user_login(request):
     if request.method == 'POST':
         form = UserLoginForm(request.POST)
@@ -103,6 +106,7 @@ def user_logout(request):
     return redirect('shop:home_page')
 
 
+@csrf_protect
 def edit_profile(request):
     form = EditProfileForm(request.POST, instance=request.user)
     if form.is_valid():
@@ -114,6 +118,7 @@ def edit_profile(request):
     context = {'title':'Edit Profile', 'form':form}
     return render(request, 'edit_profile.html', context)
 
+@csrf_protect
 def verify_code(request):
     if request.method == 'POST':
         user_code = request.POST.get('code')
@@ -192,6 +197,7 @@ def set_password(request):
     return render(request, 'set_password.html', {'phone_number': phone_number})
 
 
+@csrf_protect
 def signup(request):
     if request.method == 'POST':
         form = SignUpForm(request.POST)
@@ -209,6 +215,7 @@ def signup(request):
         form = SignUpForm()
     return render(request, 'signup.html', {'form': form})
 
+@csrf_protect
 def reset_password(request):
     if request.method == 'POST':
         form = SignUpForm(request.POST)
@@ -227,6 +234,7 @@ def reset_password(request):
     return render(request, 'reset_password.html', {'form': form})
 
 
+@csrf_protect
 def verify_reset_code(request):
     if request.method == 'POST':
         user_code = request.POST.get('code')

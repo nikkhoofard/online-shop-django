@@ -66,12 +66,12 @@ class UserLoginForm(forms.Form):
         widget=forms.TextInput(
             attrs={
                 'class': 'form-control', 
-                'placeholder': 'شماره تلفن بدون کد کشور', 
+                'placeholder': '۰۹۱۲۳۴۵۶۷۸۹', 
                 'type': 'tel',
                 'dir': 'ltr'
             }
         ),
-        max_length=15,
+        max_length=20,
         required=True
     )
 
@@ -81,31 +81,30 @@ class UserLoginForm(forms.Form):
         )
     )
 
-    
     def clean_phone_number(self):
         phone_number = self.cleaned_data.get('phone_number')
         if phone_number:
-            # Remove any spaces or dashes
-            phone_number = re.sub(r'[\s\-]', '', phone_number)
-            # Check if it contains only digits
-            if not phone_number.isdigit():
-                raise forms.ValidationError("شماره تلفن باید فقط شامل اعداد باشد.")
-            # Check length (typical mobile number length without country code)
-            if len(phone_number) < 9 or len(phone_number) > 12:
-                raise forms.ValidationError("طول شماره تلفن نامعتبر است.")
-        return phone_number
-    
-    def clean(self):
-        cleaned_data = super().clean()
-        country_code = cleaned_data.get('country_code')
-        phone_number = cleaned_data.get('phone_number')
-        
-        if country_code and phone_number:
-            # Combine country code and phone number for the full international format
-            full_number = f"{country_code}{phone_number}"
-            cleaned_data['full_phone_number'] = full_number
+            # تبدیل اعداد فارسی/عربی به انگلیسی
+            phone_number = ''.join([chr(ord(c) - 1728) if '۰' <= c <= '۹' else c for c in phone_number])
             
-        return cleaned_data
+            # حذف فاصله‌ها و خط تیره‌ها
+            phone_number = re.sub(r'[\s\-]', '', phone_number)
+            
+            # اگر با صفر شروع می‌شود، صفر را حذف کرده و +98 اضافه می‌کنیم
+            if phone_number.startswith('0'):
+                phone_number = '+98' + phone_number[1:]
+            else:
+                # اگر با صفر شروع نمی‌شود، بررسی می‌کنیم که آیا با +98 شروع می‌شود یا نه
+                if not phone_number.startswith('+98'):
+                    phone_number = '+98' + phone_number
+            
+            # بررسی اعتبار شماره تلفن
+            pattern = r"^\+98\d{10}$"  # شماره تلفن ایران با فرمت +98 و 10 رقم
+            if not re.match(pattern, phone_number):
+                raise forms.ValidationError("لطفا یک شماره موبایل معتبر وارد کنید (مثال: ۰۹۱۲۳۴۵۶۷۸۹)")
+        
+        return phone_number
+
 
 class UserRegistrationForm(forms.Form):
     email = forms.EmailField(

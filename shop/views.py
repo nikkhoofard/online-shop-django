@@ -126,6 +126,7 @@ def search(request):
     # برندها را یکتا و مرتب کنید
     brands_list = sorted(set([b.strip() for b in qs.values_list('brand', flat=True) if b]))
 
+    print(brands_list)
     # صفحه‌بندی
     paginator = Paginator(qs, 12)
     page_number = request.GET.get('page')
@@ -156,14 +157,81 @@ def search(request):
 
 
 
+
+
+
 def filter_by_category(request, slug):
-    category = Category.objects.filter(slug=slug).first()
-    if not category:
-        context = {'products': []}
-        return render(request, 'search.html', context)
-    category_ids = get_all_subcategory_ids(category)
-    products = Product.objects.filter(category_id__in=category_ids)
-    context = {'products': paginat(request, products)}
+    # Parse all filter parameters from request.GET, similar to 'search' function
+    query = request.GET.get('q', '').strip()
+    category_slugs = request.GET.getlist('category')
+    brands_from_get = request.GET.getlist('brand')
+    price_min = request.GET.get('price_min')
+    price_max = request.GET.get('price_max')
+    in_stock = request.GET.get('in_stock')
+    car_model_ids = request.GET.getlist('car_model')
+
+    # Add the current category slug from the URL to selected_categories
+    # This ensures the current category is marked as selected in the UI
+    if slug not in category_slugs:
+        category_slugs.append(slug)
+
+    main_category = Category.objects.filter(slug=slug).first()
+
+    if not main_category:
+        # If the main category from the URL slug is not found, return an empty queryset
+        qs = Product.objects.none()
+    else:
+        category_ids_for_filter = get_all_subcategory_ids(main_category)
+        qs = Product.objects.filter(category_id__in=category_ids_for_filter)
+
+    # Apply other filters from request.GET to the queryset (qs)
+    if query:
+        qs = qs.filter(
+            Q(title__icontains=query) |
+            Q(description__icontains=query) |
+            Q(brand__icontains=query)
+        )
+    if brands_from_get:
+        qs = qs.filter(brand__in=brands_from_get)
+    if price_min:
+        qs = qs.filter(price__gte=price_min)
+    if price_max:
+        qs = qs.filter(price__lte=price_max)
+    if in_stock == 'on':
+        qs = qs.filter(stock__gt=0)
+    if car_model_ids:
+        qs = qs.filter(compatible_cars__id__in=car_model_ids)
+
+    qs = qs.distinct()
+
+    # Generate brands_list from the final filtered queryset
+    brands_list = sorted(set([b.strip() for b in qs.values_list('brand', flat=True) if b]))
+
+    # Pagination
+    paginator = Paginator(qs, 12)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        'products': page_obj,
+        'categories': Category.objects.filter(is_sub=False), # All main categories for filter options
+        'brands': brands_list, # Brands relevant to the filtered products
+        'selected_categories': category_slugs,
+        'selected_brands': brands_from_get,
+        'price_min': price_min,
+        'price_max': price_max,
+        'in_stock': in_stock,
+        'car_models': CarModel.objects.all(), # All car models for filter options
+        'selected_car_models': car_model_ids,
+        'query': query, # Pass the query back to the template for input field
+    }
+
+    # Handle AJAX request
+    is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
+    if is_ajax:
+        html = render(request, 'partials/_products_list.html', context).content.decode('utf-8')
+        return JsonResponse({'html': html})
+
     return render(request, 'search.html', context)
 
 
@@ -171,6 +239,7 @@ def filter_by_category(request, slug):
 def categories_processor(request):
 	main_categories = Category.objects.filter(is_sub=False).all()
 	return {'main_categories': main_categories}
+
 
 
 def search_suggestions(request):
@@ -188,4 +257,10 @@ def get_all_subcategory_ids(category):
     for sub in category.sub_categories.all():
         ids.extend(get_all_subcategory_ids(sub))
     return ids
+
+
+
+
+
+
 
