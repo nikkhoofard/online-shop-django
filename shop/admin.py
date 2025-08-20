@@ -1,9 +1,9 @@
 from django.contrib import admin
-from .models import Product, CarBrand, CarModel, Shop, Category
+from .models import Product, CarBrand, CarModel, Shop, Category, CarArticle
 # Register your models here.
 
 
-admin.site.register(CarBrand)
+
 admin.site.register(CarModel)
 
 
@@ -28,3 +28,48 @@ class ProductAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         return super().get_queryset(request).filter(shop__owner=request.user)
+
+
+@admin.register(CarArticle)
+class CarArticleAdmin(admin.ModelAdmin):
+    list_display = ['title', 'car_brand', 'created_at', 'is_active']
+    list_filter = ['car_brand', 'created_at', 'is_active']
+    search_fields = ['title', 'content', 'car_brand__name']
+    prepopulated_fields = {'slug': ('title',)}
+    list_editable = ['is_active']
+    date_hierarchy = 'created_at'
+    
+    fieldsets = (
+        ('اطلاعات اصلی', {
+            'fields': ('car_brand', 'title', 'slug', 'image')
+        }),
+        ('محتوا', {
+            'fields': ('content',)
+        }),
+        ('وضعیت', {
+            'fields': ('is_active',)
+        }),
+    )
+
+@admin.register(CarBrand)
+class CarBrandAdmin(admin.ModelAdmin):
+    list_display = ['name', 'slug']
+    search_fields = ['name', 'slug']
+    prepopulated_fields = {'slug': ('name',)}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

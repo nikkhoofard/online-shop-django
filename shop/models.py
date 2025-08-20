@@ -69,13 +69,32 @@ garanty darad ya na
 چند ماه گارانتی دارد 
 """
 
+
+
+
 class CarBrand(models.Model):
     """Car manufacturers like Toyota, Honda, BMW, etc."""
     name = models.CharField(max_length=100, unique=True)
-    
+    slug = models.SlugField(max_length=150, unique=True, allow_unicode=True)
+
     def __str__(self):
         return self.name
 
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            base = slugify(self.name, allow_unicode=True) or f"brand-{self.pk or ''}"
+            slug = base
+            i = 1
+            # تضمین یکتایی
+            while CarBrand.objects.filter(slug=slug).exclude(pk=self.pk).exists():
+                i += 1
+                slug = f"{base}-{i}"
+            self.slug = slug
+        return super().save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        from django.urls import reverse
+        return reverse('shop:car_brand_articles', kwargs={'brand_slug': self.slug})
 class CarModel(models.Model):
     """Specific car models like Corolla, Civic, 3-Series, etc."""
     brand = models.ForeignKey(CarBrand, on_delete=models.CASCADE, related_name='car_models')
@@ -149,3 +168,35 @@ class ProductImage(models.Model):
 
     def __str__(self):
         return f"{self.product.title} - {self.id}"
+    
+
+
+class CarArticle(models.Model):
+    car_brand = models.ForeignKey(CarBrand, on_delete=models.CASCADE, related_name='articles')
+    title = models.CharField(max_length=200, verbose_name="عنوان مقاله")
+    slug = models.SlugField(unique=True, allow_unicode=True, verbose_name="اسلاگ")
+    content = models.TextField(verbose_name="محتوای مقاله")
+    image = models.ImageField(upload_to='car_articles', verbose_name="تصویر مقاله")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="تاریخ ایجاد")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="تاریخ بروزرسانی")
+    is_active = models.BooleanField(default=True, verbose_name="فعال")
+
+    def __str__(self):
+        return f"{self.car_brand.name} - {self.title}"
+    
+    def get_absolute_url(self):
+        return reverse('shop:car_article_detail', kwargs={'slug': self.slug})
+    
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.title, allow_unicode=True)
+        return super().save(*args, **kwargs)
+    
+    def get_related_products(self):
+        """دریافت محصولات مرتبط با این برند خودرو"""
+        return Product.objects.filter(
+            compatible_cars__brand=self.car_brand
+        ).distinct()[:12]
+    
+
+

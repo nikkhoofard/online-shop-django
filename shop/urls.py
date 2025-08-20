@@ -13,4 +13,7 @@ urlpatterns = [
 	path('search/', views.search, name='search'),
 	re_path(r'^filter/(?P<slug>[-\w]+)/$', views.filter_by_category, name='filter_by_category'),
 	path('search-suggestions/', views.search_suggestions, name='search_suggestions'),
-]
+    
+	re_path(r'^car-article/(?P<slug>[-\w]+)/$', views.car_article_detail, name='car_article_detail'),
+	path('brand/<str:brand_slug>/articles/', views.car_brand_articles, name='car_brand_articles')
+	]

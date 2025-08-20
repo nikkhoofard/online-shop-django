@@ -5,9 +5,9 @@ from django.core.paginator import Paginator
 from django.db.models import Q
 from django.http import JsonResponse
 
-from shop.models import Product, Category
+from shop.models import CarBrand, Product, Category
 from cart.forms import QuantityForm
-from shop.models import CarModel
+from shop.models import CarModel, CarArticle
 
 
 def categories_processor(request):
@@ -260,7 +260,31 @@ def get_all_subcategory_ids(category):
 
 
 
+def car_article_detail(request, slug):
+    article = get_object_or_404(CarArticle, slug=slug, is_active=True)
+    related_products = article.get_related_products()
+    context = {
+        'article': article,
+        'related_products': related_products,
+        'title': f"{article.car_brand.name} - {article.title}"
+    }
+    
+    return render(request, 'car_article_detail.html', context)
 
-
-
-
+def car_brand_articles(request, brand_slug):
+    """نمایش مقالات یک برند خاص"""
+    brand = get_object_or_404(CarBrand, Q(slug=brand_slug) | Q(name__iexact=brand_slug))
+    articles = CarArticle.objects.filter(car_brand=brand, is_active=True)
+    
+    # صفحه‌بندی
+    paginator = Paginator(articles, 6)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    context = {
+        'brand': brand,
+        'articles': page_obj,
+        'title': f"مقالات {brand.name}"
+    }
+    
+    return render(request, 'car_brand_articles.html', context)
