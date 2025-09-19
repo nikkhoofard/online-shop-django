@@ -1,5 +1,6 @@
 from ippanel import Client
 from online_shop import settings
+import os
 import requests
 import json
 """
@@ -17,22 +18,37 @@ def send_verification_code(phone_number, code):
 
 
 def send_verification_code(phone_number, code):
-    API_KEY = 'OWUzYzEzMjEtZjgxNS00MzRlLThhYTEtMzFjMzA4N2ExMmY1NTY1NGExODVhNDhkZGQ5NzllYjg0NGM3MzgwOGUxMjE='
- 
-    url = "https://api2.ippanel.com/api/v1/sms/pattern/normal/send"
- 
+    API_KEY = os.getenv('API_KEY')
+
+    url = "https://edge.ippanel.com/v1/api/send"
+
+    print(phone_number , code)
+          
     payload = json.dumps({
-        "code": "0s4osu9wi3ekzsv",
-        "sender": "+9810004223",
-        "recipient": phone_number ,
-        "variable": {
-          "code": code
-                      }
-          })
-    headers = { 
-        'accept': '*/*',
-        'apikey': settings.API_KEY,
-        'Content-Type': 'application/json'
+      "sending_type": "pattern",
+      "from_number": "+9810004223",
+      "code": "0s4osu9wi3ekzsv",
+      "recipients": [
+        str(phone_number)
+      ],
+      "params": {
+        "code": str(code)
+      }
+    })
+    
+    # {"sending_type": "pattern", "from_number": "+9810004223", "code": "0s4osu9wi3ekzsv", "recipients": ["+9809103799860"], "params": {"code": "8181"}}
+    # {"sending_type": "pattern", "from_number": "+9810004223", "code": "0s4osu9wi3ekzsv", "recipients": ["+989103799860"], "params": {"code": "7181"}}
+    headers = {
+  'Authorization': API_KEY,
+  'Content-Type': 'application/json',
     }
 
     response = requests.request("POST", url, headers=headers, data=payload)
+
+
+
+
+
+
+
+

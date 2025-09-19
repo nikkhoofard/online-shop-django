@@ -83,31 +83,52 @@
     
     <script>
       $(document).ready(function() {
-        // اعتبارسنجی فرم
-        $('#loginForm').on('submit', function(e) {
-          e.preventDefault();
-          
-          const phoneNumber = $('#phoneNumber').val().trim();
-          const phoneRegex = /^(09[0-9]{9}|[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})$/;
-          
-          if (!phoneRegex.test(phoneNumber)) {
-            $('#phoneNumber').addClass('is-invalid');
-            $('#phoneError').show();
-            return false;
+        function toEnglishDigits(s) {
+          const fa = '۰۱۲۳۴۵۶۷۸۹';
+          const ar = '٠١٢٣٤٥٦٧٨٩';
+          return s.replace(/[۰-۹]/g, d => fa.indexOf(d))
+                  .replace(/[٠-٩]/g, d => ar.indexOf(d));
+        }
+
+        function normalizeIrMobile(raw) {
+          let v = toEnglishDigits(raw).replace(/[^\d]/g, '');
+          if (v.startsWith('98')) {
+            v = v.slice(2);
           }
-          
-          $('#phoneNumber').removeClass('is-invalid');
-          $('#phoneError').hide();
-          
-          // ارسال به صفحه بعدی یا ارسال کد تایید
-          // در اینجا می‌توانید کد مربوط به ارسال اطلاعات به سرور را قرار دهید
-          this.submit();
-        });
-        
-        // حذف کلاس خطا هنگام تایپ
-        $('#phoneNumber').on('input', function() {
+          if (v.startsWith('0')) {
+            v = v.slice(1);
+          }
+          // Expect 10 digits starting with 9, e.g., 9xxxxxxxxx
+          return v;
+        }
+
+        $('#phoneNumber').on('input blur', function() {
+          const normalized = normalizeIrMobile($(this).val());
+          // Only replace if user had an Iranian-style format to avoid surprising behavior
+          if (normalized && (normalized.length <= 10)) {
+            $(this).val(normalized);
+          }
           $(this).removeClass('is-invalid');
           $('#phoneError').hide();
+        });
+
+        $('#loginForm').on('submit', function(e) {
+          e.preventDefault();
+
+          const raw = $('#phoneNumber').val().trim();
+          const normalized = normalizeIrMobile(raw);
+
+          // Front validation: must be 10 digits starting with 9
+          if (!/^(9\d{9})$/.test(normalized)) {
+            $('#phoneNumber').addClass('is-invalid');
+            $('#phoneError').text('لطفا شماره موبایل معتبر 10 رقمی وارد کنید').show();
+            return false;
+          }
+
+          // Ensure input contains 10-digit local part without leading 0.
+          $('#phoneNumber').val(normalized);
+
+          this.submit();
         });
       });
     </script>

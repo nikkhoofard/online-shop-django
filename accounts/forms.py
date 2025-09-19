@@ -35,31 +35,46 @@ class SignUpForm(forms.Form):
         max_length=15,
         required=True
     )
-    
+ 
+ 
     def clean_phone_number(self):
         phone_number = self.cleaned_data.get('phone_number')
         if phone_number:
-            # Remove any spaces or dashes
+            # Convert Persian/Arabic digits to English
+            phone_number = ''.join([chr(ord(c) - 1728) if '۰' <= c <= '۹' else c for c in phone_number])
+            phone_number = ''.join([chr(ord(c) - 1632) if '٠' <= c <= '٩' else c for c in phone_number])
+            # Remove spaces/dashes and any non-digits
             phone_number = re.sub(r'[\s\-]', '', phone_number)
-            # Check if it contains only digits
-            if not phone_number.isdigit():
-                raise forms.ValidationError("شماره تلفن باید فقط شامل اعداد باشد.")
-            # Check length (typical mobile number length without country code)
+            phone_number = re.sub(r'\D', '', phone_number)
+            # Basic length guard; final shape is validated in clean()
             if len(phone_number) < 9 or len(phone_number) > 12:
                 raise forms.ValidationError("طول شماره تلفن نامعتبر است.")
         return phone_number
-    
+
     def clean(self):
         cleaned_data = super().clean()
         country_code = cleaned_data.get('country_code')
         phone_number = cleaned_data.get('phone_number')
-        
+
         if country_code and phone_number:
-            # Combine country code and phone number for the full international format
-            full_number = f"{country_code}{phone_number}"
+            # Iran-specific normalization: drop any leading 98 or 0 to get 10-digit local starting with 9
+            if country_code == '+98':
+                if phone_number.startswith('98'):
+                    phone_number = phone_number[2:]
+                if phone_number.startswith('0'):
+                    phone_number = phone_number[1:]
+                if not re.fullmatch(r'9\d{9}', phone_number):
+                    raise forms.ValidationError("شماره موبایل ایران باید ۱۰ رقمی و با 9 شروع شود.")
+                full_number = f'+98{phone_number}'
+            else:
+                full_number = f'{country_code}{phone_number}'
+
             cleaned_data['full_phone_number'] = full_number
-            
+
         return cleaned_data
+ 
+ 
+
 
 class UserLoginForm(forms.Form):
     phone_number = forms.CharField(
